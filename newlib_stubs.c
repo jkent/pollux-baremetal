@@ -17,11 +17,13 @@
  */
 
 #include <errno.h>
+#include <stdio.h>
 #include <sys/stat.h>
 #include <sys/times.h>
 #include <sys/unistd.h>
 
-#include "uart.h"
+#include "baremetal/uart.h"
+#include "baremetal/util.h"
 
 #undef errno
 extern int errno;
@@ -33,10 +35,8 @@ int _write(int file, char *ptr, int len);
 
 void _exit(int status)
 {
-	_write(1, "exit", 4);
-	while (1) {
-		;
-	}
+	printf("exit with status %d", status);
+	halt();
 }
 
 int _close(int file)
@@ -124,7 +124,8 @@ int _read(int file, char *ptr, int len)
 
 caddr_t _sbrk(int incr)
 {
-	extern char __heap_bottom__;
+	extern void *__heap_start__;
+	extern void *__heap_end__;
 	static char *heap_end;
 	char *prev_heap_end;
 	char *stack;
@@ -132,13 +133,13 @@ caddr_t _sbrk(int incr)
 
 
 	if (heap_end == 0) {
-		heap_end = &__heap_bottom__;
+		heap_end = (char *)&__heap_start__;
 	}
 	prev_heap_end = heap_end;
 
 	stack = (char *)sp;
-	if (heap_end + incr > stack) {
-		_write(STDERR_FILENO, "Heap and stack collision\n", 25);
+	if (heap_end + incr > (char *)&__heap_end__) {
+		_write(STDERR_FILENO, "Heap full\n", 10);
 		errno = ENOMEM;
 		return (caddr_t) -1;
 	}
@@ -178,18 +179,16 @@ int _write(int file, char *ptr, int len)
 	switch (file) {
 	case STDOUT_FILENO: 
 		for (n = 0; n < len; n++) {
-			if (*ptr == '\n') {
+			if (*ptr == '\n')
 				uart_putchar('\r');
-			}
 			uart_putchar(*ptr++);
 		};
 		break;
 
 	case STDERR_FILENO:
 		for (n = 0; n < len; n++) {
-			if (*ptr == '\n') {
+			if (*ptr == '\n')
 				uart_putchar('\r');
-			}
 			uart_putchar(*ptr++);
 		};
 		break;

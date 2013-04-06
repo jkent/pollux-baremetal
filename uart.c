@@ -20,24 +20,39 @@
 #include "mach/uart.h"
 #include "mach/gpio.h"
 
+#include "baremetal/uart.h"
 
-static void __iomem *uart0 = (void __iomem *) UART0_BASE;
+static void __iomem *uart = (void __iomem *) UART0_BASE;
+
+
+static int uart_basic_getchar(void)
+{
+	while (!(readw(uart + UART_TRSTATUS) & UART_TRSTATUS_RXREADY));
+	return readw(uart + UART_RHB) & 0xFF;
+}
+
+static int uart_basic_putchar(int c)
+{
+	while (!(readw(uart + UART_TRSTATUS) & UART_TRSTATUS_TXEMPTY));
+	writew((u16) c & 0xFF, uart + UART_THB);
+	return 0;
+}
 
 /*
  * This is a minimal UART initialization.  We assume that PLL1 is set to the
  * default 147.461538 MHz and the UART registers are sane.
  */
-void uart_init(void)
+void uart_basic_init(void)
 {
 	void __iomem *gpioa = (void __iomem *) GPIOA_BASE;
 	u32 tmp;
 
 	/* Configure clock */
 	writel(UART_CLKGEN_CLKSRCSEL_PLL1 | UART_CLKGEN_CLKDIV(39),
-			uart0 + UART_CLKGEN);
+			uart + UART_CLKGEN);
 
 	/* Set baudrate generator to 115200 */
-	writew(1, uart0 + UART_BRD);
+	writew(1, uart + UART_BRD);
 
 	/* Set GPIO as TX */
 	tmp = readl(gpioa + GPIO_ALTFNL);
@@ -46,21 +61,27 @@ void uart_init(void)
 	writel(tmp, gpioa + GPIO_ALTFNL);
 
 	/* Enable TX and RX */
-	tmp = readw(uart0 + UART_UCON);
+	tmp = readw(uart + UART_UCON);
 	tmp &= ~(UART_UCON_TRANSMODE_MASK | UART_UCON_RECVMODE_MASK);
 	tmp |= UART_UCON_TRANSMODE_INTPOLL | UART_UCON_RECVMODE_INTPOLL;
-	writew((u16) tmp, uart0 + UART_UCON);
+	writew((u16) tmp, uart + UART_UCON);
+
+	uart_getchar = uart_basic_getchar;
+	uart_putchar = uart_basic_putchar;
 }
 
-char uart_getchar(void)
+int uart_write(const char *s)
 {
-	while (!(readw(uart0 + UART_TRSTATUS) & UART_TRSTATUS_RXREADY));
-	return readw(uart0 + UART_RHB) & 0xFF;
+	while (*s)
+		uart_putchar(*s++);
+	return 0;
 }
 
-void uart_putchar(char c)
+int uart_puts(const char *s)
 {
-	while (!(readw(uart0 + UART_TRSTATUS) & UART_TRSTATUS_TXEMPTY));
-	writew((u16) c, uart0 + UART_THB);
+	uart_write(s);
+	uart_putchar('\r');
+	uart_putchar('\n');
+	return 0;
 }
 

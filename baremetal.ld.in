@@ -15,30 +15,45 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "baremetal/config.h"
+
 OUTPUT_FORMAT("elf32-littlearm", "elf32-littlearm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
-ENTRY(_start)
+ENTRY(_entry)
 
 SECTIONS
 {
   . = 0x0;
-  .text : {
-    *(.text.startup)
-    *(.text)
+  .text.early : {
+    *baremetal.a:init.o(.text)
+    *baremetal.a:*.o(.text)
+  }
+  .rodata.early : {
+    *baremetal.a:init.o(.rodata)
+    *baremetal.a:*.o(.rodata)
   }
 
-  .rodata : { *(.rodata) }
+  . = ALIGN(0x4000);
+  main_page_table = .;
+  . += (0x4000);
 
+  .text : { *(.text) }
+  .rodata : { *(.rodata) }
   .data : { *(.data) }
 
+  . = ALIGN(4);
   __bss_start__ = .;
   .bss : { *(.bss) }
   __bss_end__ = .;
-  . = ALIGN(8);
 
-  /* 512kB shared heap/stack */
-  __heap_bottom__ = .;
-  . = . + 0x80000;
+  . = ALIGN(0x1000);
+  __heap_start__ = .;
+  . += HEAP_SIZE;
+  __heap_end__ = .;
+
+  . = ALIGN(0x1000);
+  __stack_end__ = .;
+  . += COMBINED_STACK_SIZE;
   __stack_top__ = .;
 
   /* mthumb-interwork things */

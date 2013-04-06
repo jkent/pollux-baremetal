@@ -56,8 +56,8 @@ endef
 define new_s_rule
 $(2)%.o: $(1)%.S
 	@mkdir -p $$(@D)
-	$(CC) -c $$(CFLAGS) $$(INCLUDE) -Wa,--defsym,_start=0 -o $$@ $$<
-	@$(CC) -MM $$(CFLAGS) $$(INCLUDE) -Wa,--defsym,_start=0 $$< | \
+	$(CC) -c $$(CFLAGS) $$(INCLUDE) -Wa,--defsym,_entry=0 -o $$@ $$<
+	@$(CC) -MM $$(CFLAGS) $$(INCLUDE) -Wa,--defsym,_entry=0 $$< | \
 	  sed -e 's/.*:/$$(subst /,\/,$$@):/' > $(2)$$*.d
 endef
 
@@ -69,7 +69,7 @@ $(foreach src_dir,$(sort $(DIRS)), \
 	$(eval $(call new_c_rule,$(src_dir),$(obj_dir))) \
 )
 
-OBJS    = $(subst ./,./obj/,$(S_SRCS:.S=.o) $(C_SRCS:.c=.o))
+OBJS = $(subst ./,./obj/,$(S_SRCS:.S=.o) $(C_SRCS:.c=.o))
 
 %.a: $(OBJS)
 	@mkdir -p $(@D)

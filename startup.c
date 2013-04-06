@@ -15,11 +15,40 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __UART0_H__
-#define __UART0_H__
+#include <stdio.h>
 
-void uart_init(void);
-char uart_getchar(void);
-void uart_putchar(char c);
+#include "baremetal/clocking.h"
+#include "baremetal/mmu.h"
+#include "baremetal/uart.h"
+#include "baremetal/util.h"
 
-#endif /* __UART0_H__ */
+extern void uart_basic_init(void);
+extern int main(void);
+
+void __attribute__((naked, noreturn)) _start(void)
+{
+	int i;
+
+	uart_basic_init();
+
+	fputs("\nstartup:", stdout);
+	fflush(stdout);
+
+	fputs(" ddr", stdout);
+	fflush(stdout);
+	init_ddr();
+
+	fputs(" pll", stdout);
+	fflush(stdout);
+	init_pll();
+
+	fputs(" mmu", stdout);
+	fflush(stdout);
+	enable_mmu();
+
+	fputs("\nOK!\n", stdout);
+
+	i = main();
+	printf("main exited with %d\n", i);
+	halt();
+}

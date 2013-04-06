@@ -15,10 +15,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _UTIL_H_
-#define _UTIL_H_
+#ifndef _BAREMETAL_UTIL_H_
+#define _BAREMETAL_UTIL_H_
 
-/* include/linux/kernel.h */
+#include "asm/types.h"
+
+/* from include/linux/kernel.h */
 
 /*
  * min()/max()/clamp() macros that also do
@@ -57,5 +59,26 @@
 	const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
 	(type *)( (char *)__mptr - offsetof(type,member) );})
 
-#endif /* _UTIL_H_ */
+void __attribute__((noreturn)) halt(void);
+
+static inline void __attribute__((always_inline)) enable_interrupts(void)
+{
+	u32 n;
+
+	asm("mrs r0, cpsr_c\n\t":"=r"(n));
+	n &= ~(0x80);
+	asm("msr r0, cpsr_c\n\t"::"r"(n));
+}
+
+static inline void __attribute__((always_inline)) disable_interrupts(void)
+{
+	u32 n;
+
+	asm("mrs r0, cpsr_c\n\t":"=r"(n));
+	n |= 0x80;
+	asm("msr r0, cpsr_c\n\t"::"r"(n));
+}
+
+
+#endif /* _BAREMETAL_UTIL_H_ */
 

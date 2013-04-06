@@ -17,7 +17,7 @@
 
 #include <stdint.h>
 
-#include "irq.h"
+#include "baremetal/irq.h"
 
 irq_handler_t irq_handlers[64] = {0};
 
