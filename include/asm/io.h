@@ -41,6 +41,13 @@ static inline void __attribute__((always_inline)) __raw_writel(u32 val, volatile
 	             : "r" (val));
 }
 
+static inline void __attribute__((always_inline)) __raw_writeq(u64 val, volatile void __iomem *addr)
+{
+	asm volatile("strd %Q1, %R1, %0"
+	             : "+Qo" (*(volatile u32 __force *)addr)
+	             : "r" (val));
+}
+
 static inline u8 __attribute__((always_inline)) __raw_readb(const volatile void __iomem *addr)
 {
 	u8 val;
@@ -68,16 +75,27 @@ static inline u32 __attribute__((always_inline)) __raw_readl(const volatile void
 	return val;
 }
 
+static inline u64 __attribute__((always_inline)) __raw_readq(const volatile void __iomem *addr)
+{
+	u64 val;
+	asm volatile("ldrd %Q1, %R1, %0"
+	             : "+Qo" (*(volatile u32 __force *)addr),
+	               "=r" (val));
+	return val;
+}
+
 #define __iormb()
 #define __iowmb()
 
 #define readb(c)		({ u8  __v = __raw_readb(c); __iormb(); __v; })
 #define readw(c)		({ u16 __v = __raw_readw(c); __iormb(); __v; })
 #define readl(c)		({ u32 __v = __raw_readl(c); __iormb(); __v; })
+#define readq(c)		({ u64 __v = __raw_readq(c); __iormb(); __v; })
 
 #define writeb(v,c)		({ __iowmb(); __raw_writeb(v,c); })
 #define writew(v,c)		({ __iowmb(); __raw_writew(v,c); })
 #define writel(v,c)		({ __iowmb(); __raw_writel(v,c); })
+#define writeq(v,c)		({ __iowmb(); __raw_writeq(v,c); })
 
 #endif /* __ASM_IO_H__ */
 

@@ -50,5 +50,13 @@
 #define NAND_CMD_RNDOUTSTART		(0xe0)
 #define NAND_CMD_CACHEDPROG		(0x15)
 
+#define NAND_STATUS_FAIL		(0x01)
+#define NAND_STATUS_FAIL_N1		(0x02)
+#define NAND_STATUS_TRUE_READY		(0x20)
+#define NAND_STATUS_READY		(0x40)
+#define NAND_STATUS_WP			(0x80)
+
+#define NAND_MAX_CHIPS			(2)
+
 #endif /* _MACH_NAND_H */
 
