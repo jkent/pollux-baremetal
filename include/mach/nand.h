@@ -56,7 +56,5 @@
 #define NAND_STATUS_READY		(0x40)
 #define NAND_STATUS_WP			(0x80)
 
-#define NAND_MAX_CHIPS			(2)
-
 #endif /* _MACH_NAND_H */
 
