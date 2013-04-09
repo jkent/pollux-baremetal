@@ -27,7 +27,7 @@ extern int main(void);
 
 int ramsize;
 
-void detect_ram(void)
+static void detect_ram(void)
 {
 	ramsize = 128;
 	unsigned int *p = (unsigned int *)((ramsize << 20) - 4);
