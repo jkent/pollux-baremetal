@@ -25,17 +25,36 @@
 extern void uart_basic_init(void);
 extern int main(void);
 
+int ramsize;
+
+void detect_ram(void)
+{
+	ramsize = 128;
+	unsigned int *p = (unsigned int *)((ramsize << 20) - 4);
+	*p = 0x55AA55AA;
+
+	while (*p == 0x55AA55AA) {
+		ramsize >>= 1;
+		p = (unsigned int *)((ramsize << 20) - 4);
+	}
+	ramsize <<= 1;
+
+	if (ramsize > 128)
+		ramsize = -1;
+}
+
 void __attribute__((naked, noreturn)) _start(void)
 {
 	int i;
 
 	uart_basic_init();
 
-	fputs("\nstartup:", stdout);
+	fputs("startup:", stdout);
 	fflush(stdout);
 
 	fputs(" ddr", stdout);
 	fflush(stdout);
+	detect_ram();
 	init_ddr();
 
 	fputs(" pll", stdout);
@@ -46,7 +65,7 @@ void __attribute__((naked, noreturn)) _start(void)
 	fflush(stdout);
 	enable_mmu();
 
-	fputs("\nOK!\n", stdout);
+	fputs("\n\n", stdout);
 
 	i = main();
 	printf("main exited with %d\n", i);
