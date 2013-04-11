@@ -15,13 +15,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __BAREMETAL_MMU_H__
-#define __BAREMETAL_MMU_H__
+#ifndef __BAREMETAL_MMU_H
+#define __BAREMETAL_MMU_H
 
 #include "asm/types.h"
 
 extern u32 main_page_table[];
 void enable_mmu(void);
 
-#endif /* __BAREMETAL_MMU_H__ */
+#endif /* __BAREMETAL_MMU_H */
 

@@ -15,13 +15,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __BAREMETAL_CLOCKING_H__
-#define __BAREMETAL_CLOCKING_H__
+#ifndef __BAREMETAL_CLOCKING_H
+#define __BAREMETAL_CLOCKING_H
 
 #include "asm/types.h"
 
 void init_ddr(void);
 void init_pll(void);
 
-#endif /* __BAREMETAL_CLOCKING_H__ */
+#endif /* __BAREMETAL_CLOCKING_H */
 

@@ -15,12 +15,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __BAREMETAL_UART_H__
-#define __BAREMETAL_UART_H__
+#ifndef __BAREMETAL_UART_H
+#define __BAREMETAL_UART_H
 
 int (*uart_getchar)(void);
 int (*uart_putchar)(int c);
 int uart_write(const char *s);
 int uart_puts(const char *s);
 
-#endif /* __BAREMETAL_UART_H__ */
+#endif /* __BAREMETAL_UART_H */

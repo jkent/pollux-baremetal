@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013 Jeff Kent <jeff@jkent.net>
+ * This is a derivative work of arch/arm/include/asm/io.h from the
+ * Linux 3.9-rc6 kernel source.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -15,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __ASM_IO_H__
-#define __ASM_IO_H__
+#ifndef __ASM_ARM_IO_H
+#define __ASM_ARM_IO_H
 
 #include "asm/types.h"
 
@@ -97,5 +98,5 @@ static inline u64 __attribute__((always_inline)) __raw_readq(const volatile void
 #define writel(v,c)		({ __iowmb(); __raw_writel(v,c); })
 #define writeq(v,c)		({ __iowmb(); __raw_writeq(v,c); })
 
-#endif /* __ASM_IO_H__ */
+#endif /* __ASM_ARM_IO_H */
 

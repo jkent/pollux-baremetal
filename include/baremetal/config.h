@@ -15,8 +15,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __BAREMETAL_CONFIG_H__
-#define __BAREMETAL_CONFIG_H__
+#ifndef __BAREMETAL_CONFIG_H
+#define __BAREMETAL_CONFIG_H
 
 #define ABT_STACK_SIZE (   1 * 1024)
 #define UND_STACK_SIZE (   1 * 1024)
@@ -29,5 +29,5 @@
 
 #define HEAP_SIZE      ( 128 * 1024)
 
-#endif /* __BAREMETAL_CONFIG_H__ */
+#endif /* __BAREMETAL_CONFIG_H */
 

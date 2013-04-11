@@ -1,6 +1,4 @@
 /*
- * Copyright (C) 2013 Jeff Kent <jeff@jkent.net>
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
@@ -15,8 +13,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _BAREMETAL_UTIL_H_
-#define _BAREMETAL_UTIL_H_
+#ifndef __BAREMETAL_UTIL_H
+#define __BAREMETAL_UTIL_H
 
 #include "asm/types.h"
 
@@ -80,5 +78,5 @@ static inline void __attribute__((always_inline)) disable_interrupts(void)
 }
 
 
-#endif /* _BAREMETAL_UTIL_H_ */
+#endif /* __BAREMETAL_UTIL_H */
 
