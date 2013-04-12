@@ -17,6 +17,9 @@
 
 #include <stdio.h>
 
+#include "asm/io.h"
+#include "mach/mcuy.h"
+
 #include "baremetal/clocking.h"
 #include "baremetal/mmu.h"
 #include "baremetal/uart.h"
@@ -29,18 +32,22 @@ int ramsize;
 
 static void detect_ram(void)
 {
-	ramsize = 128;
-	unsigned int *p = (unsigned int *)((ramsize << 20) - 4);
-	*p = 0x55AA55AA;
+	u32 memcfg;
+	volatile u32 *low, *high;
 
-	while (*p == 0x55AA55AA) {
-		ramsize >>= 1;
-		p = (unsigned int *)((ramsize << 20) - 4);
-	}
+	memcfg = readl((void __iomem *) MCUY_BASE + MCUY_CFG);
+	ramsize = 8 << (memcfg & 0x3);
+
+	low = (u32 *)((ramsize << 20) - 4);
+	high = (u32 *)(((ramsize + 64) << 20) - 4);
+
+	*low = 0x55AA55AA;
+	*high = 0xAA55AA55;
+
+	if (*low == 0xAA55AA55)
+		return;
+
 	ramsize <<= 1;
-
-	if (ramsize > 128)
-		ramsize = -1;
 }
 
 void __attribute__((naked, noreturn)) _start(void)
