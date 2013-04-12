@@ -394,8 +394,8 @@ struct usb_endpoint_descriptor {
 
 	/* NOTE:  these two are _only_ in audio endpoints. */
 	/* use USB_DT_ENDPOINT*_SIZE in bLength, not sizeof. */
-	u8  bRefresh;
-	u8  bSynchAddress;
+	//u8  bRefresh;
+	//u8  bSynchAddress;
 } __attribute__ ((packed));
 
 #define USB_DT_ENDPOINT_SIZE		7
