@@ -17,6 +17,7 @@
 #define __BAREMETAL_UTIL_H
 
 #include "asm/types.h"
+#include "linux/stddef.h"
 
 /* from include/linux/kernel.h */
 
