@@ -15,13 +15,18 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __BAREMETAL_UART_H
-#define __BAREMETAL_UART_H
+#include "asm/io.h"
+#include "mach/clkpwr.h"
 
-void uart_basic_init(void);
-int (*uart_getchar)(void);
-int (*uart_putchar)(int c);
-int uart_write(const char *s);
-int uart_puts(const char *s);
+static void __iomem *clkpwr = (void __iomem *) CLKPWR_BASE;
 
-#endif /* __BAREMETAL_UART_H */
+void __attribute__((noreturn)) halt(void)
+{
+	u32 tmp;
+	while (1) {
+		tmp = readl(clkpwr + CLKPWR_PWRMODE);
+		tmp |= CLKPWR_PWRMODE_CURPWRMODE_STOP;
+		writel(tmp, clkpwr + CLKPWR_PWRMODE);
+	}
+}
+

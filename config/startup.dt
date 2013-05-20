@@ -1,0 +1,91 @@
+menu "Baremetal: startup"
+
+choice BAREMETAL_BOOT_SOURCE
+	prompt "Boot source"
+config BAREMETAL_BOOT_SOURCE_RAM
+	bool "RAM"
+config BAREMETAL_BOOT_SOURCE_UART
+	bool "UART boot"
+	depends on NOT_IMPLEMENTED
+config BAREMETAL_BOOT_SOURCE_NAND
+	bool "NAND flash"
+	depends on HAVE_NAND
+config BAREMETAL_BOOT_SOURCE_NOR
+	bool "NOR flash"
+	depends on HAVE_NOR
+	depends on NOT_IMPLEMENTED
+endchoice
+
+config BAREMETAL_SHADOW
+	bool "Shadow RAM" if BAREMETAL_BOOT_SOURCE_RAM
+	default y if BAREMETAL_BOOT_SOURCE_RAM
+	default y if BAREMETAL_BOOT_SOURCE_UART
+	default y if BAREMETAL_BOOT_SOURCE_NAND
+	help
+	  If enabled, DDR (MCU-Y) starts at physical address 0x00000000 and
+	  the static bus (MCU-S) starts at 0x80000000.  Otherwise these two
+	  1GB memory spaces are reversed.  Under most circumstances you want
+	  this enabled.
+
+config BAREMETAL_ENTRY_ADDRESS
+	hex "Entry address" if BAREMETAL_BOOT_SOURCE_RAM
+	default 0x00000000 if BAREMETAL_SHADOW
+	default 0x80000000 if !BAREMETAL_SHADOW
+	range 0x00000000 0x07FFFFFF if BAREMETAL_SHADOW
+	range 0x80000000 0x87FFFFFF if !BAREMETAL_SHADOW
+
+config BAREMETAL_RELOCATE
+	bool "Relocate" if BAREMETAL_BOOT_SOURCE_RAM
+	default y if BAREMETAL_BOOT_SOURCE_RAM
+
+config BAREMETAL_LOAD_ADDRESS
+	hex "Load address" if !BAREMETAL_BOOT_SOURCE_RAM || BAREMETAL_RELOCATE
+	default 0x00800000 if BAREMETAL_SHADOW
+	default 0x80800000 if !BAREMETAL_SHADOW
+	range 0x00000000 0x07FFFFFF if BAREMETAL_SHADOW
+	range 0x80000000 0x87FFFFFF if !BAREMETAL_SHADOW
+
+config BAREMETAL_STACK_SIZE
+	hex "Stack size"
+	default 0x40000
+
+config BAREMETAL_ENABLE_ICACHE
+	bool "Enable ICache"
+	default y
+	select BAREMETAL_CACHE
+	help
+	  Say Y here to enable the instruction cache.  In almost all
+	  circumstances you want this.
+
+config BAREMETAL_ENABLE_DCACHE
+	bool "Enable DCache"
+	depends on BAREMETAL_ENABLE_ICACHE
+	default y
+	help
+	  Say Y here to enable the data cache and MMU. The MMU is setup with a
+	  basic 1:1 memory map.
+
+config BAREMETAL_DDR_INIT
+	bool "Initialize DDR"
+	default y
+	select BAREMETAL_CLOCKING
+
+choice BAREMETAL_PLL0_INIT
+	prompt "Initialize PLL0"
+	default BAREMETAL_PLL0_INIT_533
+	depends on BAREMETAL_ENABLE_ICACHE
+	help
+	  PLL0 is the clock source for the ARM9 CPU. It is initially 384 MHz.
+config BAREMETAL_PLL0_INIT_NONE
+	bool "none"
+config BAREMETAL_PLL0_INIT_533
+	bool "533 MHz"
+	select BAREMETAL_CLOCKING
+	select BAREMETAL_PLL0_INIT
+endchoice
+
+config BAREMETAL_PLL0_INIT
+	bool
+
+endmenu
+

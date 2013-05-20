@@ -1,0 +1,3 @@
+source "$_DT_PROJECT/baremetal/config/features.dt"
+source "$_DT_PROJECT/baremetal/config/startup.dt"
+

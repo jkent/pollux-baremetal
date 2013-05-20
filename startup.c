@@ -15,66 +15,40 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <stdio.h>
-
-#include "asm/io.h"
-#include "mach/mcuy.h"
-
-#include "baremetal/clocking.h"
-#include "baremetal/mmu.h"
+#include "config.h"
+#include "baremetal/cache.h"
 #include "baremetal/uart.h"
 #include "baremetal/util.h"
 
-extern void uart_basic_init(void);
+extern void ddr_init(void);
+extern void pll0_init(void);
 extern int main(void);
 
-int ramsize;
-
-static void detect_ram(void)
+__attribute__((noreturn))
+__attribute__((naked))
+void startup(void)
 {
-	u32 memcfg;
-	volatile u32 *low, *high;
+#if defined(CONFIG_BAREMETAL_ENABLE_DCACHE)
+	init_tlb(main_tlb);
+	assign_tlb(main_tlb);
+	enable_cache();
+#elif defined(CONFIG_BAREMETAL_ENABLE_ICACHE)
+	enable_cache();
+#endif
 
-	memcfg = readl((void __iomem *) MCUY_BASE + MCUY_CFG);
-	ramsize = 8 << (memcfg & 0x3);
+#if defined(CONFIG_BAREMETAL_DDR_INIT)
+	ddr_init();
+#endif
 
-	low = (u32 *)((ramsize << 20) - 4);
-	high = (u32 *)(((ramsize + 64) << 20) - 4);
+#if defined(CONFIG_BAREMETAL_PLL0_INIT)
+	pll0_init();
+#endif
 
-	*low = 0x55AA55AA;
-	*high = 0xAA55AA55;
-
-	if (*low == 0xAA55AA55)
-		return;
-
-	ramsize <<= 1;
-}
-
-void __attribute__((naked, noreturn)) _start(void)
-{
-	int i;
-
+#if defined(CONFIG_BAREMETAL_UART_BASIC)
 	uart_basic_init();
+#endif
 
-	fputs("startup:", stdout);
-	fflush(stdout);
-
-	fputs(" ddr", stdout);
-	fflush(stdout);
-	detect_ram();
-	init_ddr();
-
-	fputs(" pll", stdout);
-	fflush(stdout);
-	init_pll();
-
-	fputs(" mmu", stdout);
-	fflush(stdout);
-	enable_mmu();
-
-	fputs("\n\n", stdout);
-
-	i = main();
-	printf("main exited with %d\n", i);
+	main();
 	halt();
 }
+

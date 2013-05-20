@@ -15,13 +15,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "config.h"
 #include "asm/io.h"
+#include "asm/types.h"
 #include "mach/clkpwr.h"
 #include "mach/mcuy.h"
 
-#include "baremetal/clocking.h"
-
-void init_ddr(void)
+#if defined(CONFIG_BAREMETAL_DDR_INIT)
+void ddr_init(void)
 {
 	u16 cfg;
 	void __iomem *mcuy = (void __iomem *) MCUY_BASE;
@@ -58,8 +59,10 @@ void init_ddr(void)
 
 	while (readw(mcuy + MCUY_TIME1) & 0x8000);
 }
+#endif
 
-void init_pll(void)
+#if defined(CONFIG_BAREMETAL_PLL0_INIT_533)
+void pll0_init(void)
 {
 	u32 cfg;
 	void __iomem *clkpwr = (void __iomem *) CLKPWR_BASE;
@@ -81,4 +84,5 @@ void init_pll(void)
 
 	while (readl(clkpwr + CLKPWR_PWRMODE) & CLKPWR_PWRMODE_CHGPLL);
 }
+#endif
 

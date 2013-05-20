@@ -125,27 +125,23 @@ caddr_t _sbrk(int incr)
 {
 	extern void *__heap_start__;
 	extern void *__heap_end__;
-	static char *heap_end;
-	char *prev_heap_end;
-	char *stack;
-	register int *sp asm("sp");
+	static char *heap_end_ptr;
+	char *prev_heap_end_ptr;
 
-
-	if (heap_end == 0) {
-		heap_end = (char *)&__heap_start__;
+	if (heap_end_ptr == 0) {
+		heap_end_ptr = (char *)&__heap_start__;
 	}
-	prev_heap_end = heap_end;
+	prev_heap_end_ptr = heap_end_ptr;
 
-	stack = (char *)sp;
-	if (heap_end + incr > (char *)&__heap_end__) {
+	if (heap_end_ptr + incr > (char *)&__heap_end__) {
 		_write(STDERR_FILENO, "Heap full\n", 10);
 		errno = ENOMEM;
 		return (caddr_t) -1;
 	}
 
-	heap_end += incr;
+	heap_end_ptr += incr;
 
-	return (caddr_t) prev_heap_end;
+	return (caddr_t) prev_heap_end_ptr;
 }
 
 int _stat(const char *filepath, struct stat *st)

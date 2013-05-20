@@ -20,8 +20,8 @@
 
 #include "asm/types.h"
 
-void init_ddr(void);
-void init_pll(void);
+void ddr_init(void);
+void pll0_init(void);
 
 #endif /* __BAREMETAL_CLOCKING_H */
 

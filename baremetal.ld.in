@@ -15,7 +15,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "baremetal/config.h"
+#include "config.h"
 
 OUTPUT_FORMAT("elf32-littlearm", "elf32-littlearm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
@@ -23,40 +23,74 @@ ENTRY(_entry)
 
 SECTIONS
 {
-  . = 0x0;
-  .text.early : {
-    *baremetal.a:init.o(.text)
-    *baremetal.a:*.o(.text)
+  . = CONFIG_BAREMETAL_ENTRY_ADDRESS;
+  __early_start__ = .;
+  .early.text : {
+    OBJDIR/baremetal/entry.o(.text .stub .text.*)
+    OBJDIR/baremetal/early.o(.text .stub .text.*)
   }
-  .rodata.early : {
-    *baremetal.a:init.o(.rodata)
-    *baremetal.a:*.o(.rodata)
+  .early.rodata : {
+    OBJDIR/baremetal/entry.o(.rodata .rodata.*)
+    OBJDIR/baremetal/early.o(.rodata .rodata.*)
   }
-
+#if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) \
+ || defined(CONFIG_BAREMETAL_BOOT_SOURCE_NAND)
   . = ALIGN(0x4000);
-  main_page_table = .;
-  . += (0x4000);
+#else
+  . = ALIGN(0x8);
+#endif
+  __early_end__ = .;
 
-  .text : { *(.text) }
-  .rodata : { *(.rodata) }
-  .data : { *(.data) }
+#if defined(CONFIG_BAREMETAL_RELOCATE)
+  . = CONFIG_BAREMETAL_LOAD_ADDRESS;
+  __reloc_start__ = .;
+#endif
+  .text : AT(__early_end__) {
+    OBJDIR/baremetal/startup.o(.text)
+    *(.text.startup .text.startup.*)
+    *(.text .stub .text.*)
+    *(.glue_7t) *(.glue_7) *(.vfp11_veneer) *(.v4_bx)
+  }
+  .rodata : {
+    *(.rodata .rodata.*)
+  }
+  .got : {
+    *(.got.plt) *(.igot.plt) *(.got) *(.igot)
+  }
+  .data : {
+    *(.data .data.*)
+  }
+  . = ALIGN(0x8);
+#if defined(CONFIG_BAREMETAL_RELOCATE)
+  __reloc_end__ = .;
+#endif
 
-  . = ALIGN(4);
-  __bss_start__ = .;
-  .bss : { *(.bss) }
-  __bss_end__ = .;
+  .bss : {
+    __bss_start__ = .;
+    *(.bss .bss.*)
+    *(COMMON)
+#if defined(CONFIG_BAREMETAL_ENABLE_DCACHE)
+    main_tlb = ALIGN(0x4000);
+    . = main_tlb + 0x4000;
+#endif
+    . = ALIGN(0x4);
+    __bss_end__ = .;
+  }
 
-  . = ALIGN(0x1000);
-  __heap_start__ = .;
-  . += HEAP_SIZE;
-  __heap_end__ = .;
+#if defined(CONFIG_BAREMETAL_CLIB_NEWLIB)
+  .heap : {
+    __heap_start__ = .;
+    . += CONFIG_BAREMETAL_HEAP_SIZE;
+    . = ALIGN(0x4);
+    __heap_end__ = .;
+  }
+#endif
 
-  . = ALIGN(0x1000);
-  __stack_end__ = .;
-  . += COMBINED_STACK_SIZE;
-  __stack_top__ = .;
-
-  /* mthumb-interwork things */
-  /DISCARD/ : { *(.glue_7 .glue_7t .vfp11_veneer .v4_bx) }
+  .stack : {
+    __stack_end__ = .;
+    . += CONFIG_BAREMETAL_STACK_SIZE;
+    . = ALIGN(0x4);
+    __stack_top__ = .;
+  }
 }
 

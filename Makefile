@@ -15,78 +15,22 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-NAME    = baremetal
-TARGET  = $(NAME).a
+subdir-$(CONFIG_BAREMETAL_CLIB_NANOLIB) += nanolib
+obj-$(CONFIG_BAREMETAL_CLIB_NEWLIB) += newlib_stubs.o
+libs-$(CONFIG_BAREMETAL_CLIB_NEWLIB) += -lc
 
-DIRS    = ./
+include-y += include
 
-CC      = $(CROSS_COMPILE)gcc
-AR      = $(CROSS_COMPILE)ar
-RANLIB  = $(CROSS_COMPILE)ranlib
- 
-# pedantic removed due to braced expressions
-CFLAGS  = -std=gnu99 -Wall -fms-extensions \
-          -mcpu=arm926ej-s -mlittle-endian -msoft-float \
-          -ffast-math
-ASFLAGS = -Wa,
-INCLUDE = -I./include
+# entry and early are the first bit of code that executes
+# they should stand alone except for the jump to startup
+obj-y += entry.o early.o
 
-ifneq ($(NODEBUG), 1)
-	CFLAGS += -O0 -g3 -DDEBUG
-else
-	CFLAGS += -Os
-endif
+# startup is the first relocated code to execute
+# it will call main()
+obj-y += startup.o
 
-
-.SECONDARY:
-.PHONY: all
-all: $(TARGET)
-	@$(MAKE) -s deps
-
--include obj/deps.mk
-
-define new_c_rule
-$(2)%.o: $(1)%.c
-	@mkdir -p $$(@D)
-	$(CC) -c $$(CFLAGS) $$(INCLUDE) -o $$@ -c $$<
-	@$(CC) -MM $$(CFLAGS) $$(INCLUDE) $$< | \
-	  sed -e 's/.*:/$$(subst /,\/,$$@):/' > $(2)$$*.d
-endef
-
-define new_s_rule
-$(2)%.o: $(1)%.S
-	@mkdir -p $$(@D)
-	$(CC) -c $$(CFLAGS) $$(INCLUDE) -Wa,--defsym,_entry=0 -o $$@ $$<
-	@$(CC) -MM $$(CFLAGS) $$(INCLUDE) -Wa,--defsym,_entry=0 $$< | \
-	  sed -e 's/.*:/$$(subst /,\/,$$@):/' > $(2)$$*.d
-endef
-
-$(foreach src_dir,$(sort $(DIRS)), \
-	$(eval S_SRCS += $(wildcard $(src_dir)*.S)) \
-	$(eval C_SRCS += $(wildcard $(src_dir)*.c)) \
-	$(eval obj_dir = $(subst ./,obj/,$(src_dir))) \
-	$(eval $(call new_s_rule,$(src_dir),$(obj_dir))) \
-	$(eval $(call new_c_rule,$(src_dir),$(obj_dir))) \
-)
-
-OBJS = $(subst ./,./obj/,$(S_SRCS:.S=.o) $(C_SRCS:.c=.o))
-
-%.a: $(OBJS)
-	@mkdir -p $(@D)
-	$(AR) rc $@ $^
-	$(RANLIB) $@
-
-.PHONY: deps
-deps: $(TARGET)
-	@rm -f ./obj/deps.mk
-	@$(foreach directory,$(subst ./,./obj/,$(DIRS)), \
-	  $(foreach file,$(wildcard $(directory)/*.d), \
-		cat $(file) >> ./obj/deps.mk; \
-	  ) \
-	)
-
-.PHONY: clean
-clean:
-	rm -rf ./obj
-	rm -f $(TARGET)
+obj-y += halt.o
+obj-$(CONFIG_BAREMETAL_UART) += uart.o
+obj-$(CONFIG_BAREMETAL_CACHE) += _cache.o cache.o
+obj-$(CONFIG_BAREMETAL_CLOCKING) += clocking.o
 

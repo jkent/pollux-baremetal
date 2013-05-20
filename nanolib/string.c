@@ -15,13 +15,20 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __BAREMETAL_UART_H
-#define __BAREMETAL_UART_H
+#include <string.h>
 
-void uart_basic_init(void);
-int (*uart_getchar)(void);
-int (*uart_putchar)(int c);
-int uart_write(const char *s);
-int uart_puts(const char *s);
+void *memset(void *s, int c, size_t n)
+{
+	unsigned char *p = (unsigned char *)s;
+	while (n--)
+		*p++ = (unsigned char)c;
+	return s;
+}
 
-#endif /* __BAREMETAL_UART_H */
+size_t strlen(const char *s)
+{
+	size_t len = 0;
+	while (s[len++]);
+	return len;
+}
+

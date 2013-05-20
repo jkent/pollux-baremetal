@@ -15,13 +15,26 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __BAREMETAL_UART_H
-#define __BAREMETAL_UART_H
+#ifndef _STDIO_H
+#define _STDIO_H
 
-void uart_basic_init(void);
-int (*uart_getchar)(void);
-int (*uart_putchar)(int c);
-int uart_write(const char *s);
-int uart_puts(const char *s);
+#include <stdio.h>
+#include "config.h"
 
-#endif /* __BAREMETAL_UART_H */
+# include "baremetal/uart.h"
+
+#define FILE void
+#define stdin (void *)0
+#define stdout (void *)1
+#define stderr (void *)2
+
+int printf (const char *, ...);
+
+# define putchar(c) uart_putchar((char)c)
+# define puts(s) uart_puts(s)
+# define fputc(c, stream) uart_putchar((char)c)
+# define fputs(s, stream) uart_write(s)
+# define fflush(stream)
+
+#endif /* _STDIO_H */
+

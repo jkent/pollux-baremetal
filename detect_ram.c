@@ -15,13 +15,27 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __BAREMETAL_UART_H
-#define __BAREMETAL_UART_H
+#include "asm/io.h"
+#include "mach/mcuy.h"
 
-void uart_basic_init(void);
-int (*uart_getchar)(void);
-int (*uart_putchar)(int c);
-int uart_write(const char *s);
-int uart_puts(const char *s);
+int ramsize;
 
-#endif /* __BAREMETAL_UART_H */
+static void detect_ram(void)
+{
+	u32 memcfg;
+	volatile u32 *low, *high;
+
+	memcfg = readl((void __iomem *) MCUY_BASE + MCUY_CFG);
+	ramsize = 8 << (memcfg & 0x3);
+
+	low = (u32 *)((ramsize << 20) - 4);
+	high = (u32 *)(((ramsize + 64) << 20) - 4);
+
+	*low = 0x55AA55AA;
+	*high = 0xAA55AA55;
+
+	if (*low == 0xAA55AA55)
+		return;
+
+	ramsize <<= 1;
+}

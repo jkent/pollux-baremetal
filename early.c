@@ -15,13 +15,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __BAREMETAL_UART_H
-#define __BAREMETAL_UART_H
+#include "config.h"
 
-void uart_basic_init(void);
-int (*uart_getchar)(void);
-int (*uart_putchar)(int c);
-int uart_write(const char *s);
-int uart_puts(const char *s);
+#if defined(CONFIG_BOOT_SOURCE_NAND)
+void nand_startup(void *load_addr)
+{
+}
+#endif
 
-#endif /* __BAREMETAL_UART_H */
+#if defined(CONFIG_BOOT_SOURCE_UART)
+void uart_startup(void *load_addr)
+{
+}
+#endif
