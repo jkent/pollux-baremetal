@@ -2,7 +2,6 @@ menu "Baremetal: features"
 
 choice BAREMETAL_CLIB
 	prompt "C Library"
-	default BAREMETAL_CLIB_NANOLIB
 config BAREMETAL_CLIB_NANOLIB
 	bool "Nanolib"
 config BAREMETAL_CLIB_NEWLIB
@@ -15,9 +14,6 @@ config BAREMETAL_HEAP_SIZE
 
 choice BAREMETAL_UART
 	prompt "UART implementation"
-	default BAREMETAL_UART_BASIC
-config BAREMETAL_UART_NONE
-	bool "none"
 config BAREMETAL_UART_BASIC
 	bool "basic"
 	select BAREMETAL_UART
@@ -25,6 +21,8 @@ config BAREMETAL_UART_FIFO
 	bool "FIFO"
 	depends on NOT_IMPLEMENTED
 	select BAREMETAL_UART
+config BAREMETAL_UART_NONE
+	bool "none"
 endchoice
 
 config BAREMETAL_UART
