@@ -25,13 +25,18 @@ SECTIONS
 {
   . = CONFIG_BAREMETAL_ENTRY_ADDRESS;
   __early_start__ = .;
-  .early.text : {
-    OBJDIR/baremetal/entry.o(.text .stub .text.*)
-    OBJDIR/baremetal/early.o(.text .stub .text.*)
-  }
-  .early.rodata : {
-    OBJDIR/baremetal/entry.o(.rodata .rodata.*)
-    OBJDIR/baremetal/early.o(.rodata .rodata.*)
+  .early : {
+#if defined(BUILD)
+    BUILD/baremetal/entry.o(.text .stub .text.*)
+    BUILD/baremetal/early.o(.text .stub .text.*)
+    BUILD/baremetal/entry.o(.rodata .rodata.*)
+    BUILD/baremetal/early.o(.rodata .rodata.*)
+#else
+    baremetal/entry.o(.text .stub .text.*)
+    baremetal/early.o(.text .stub .text.*)
+    baremetal/entry.o(.rodata .rodata.*)
+    baremetal/early.o(.rodata .rodata.*)
+#endif
   }
 #if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) \
  || defined(CONFIG_BAREMETAL_BOOT_SOURCE_NAND)
@@ -46,7 +51,11 @@ SECTIONS
   __reloc_start__ = .;
 #endif
   .text : AT(__early_end__) {
-    OBJDIR/baremetal/startup.o(.text)
+#if defined(BUILD)
+    BUILD/baremetal/startup.o(.text)
+#else
+    baremetal/startup.o(.text)
+#endif
     *(.text.startup .text.startup.*)
     *(.text .stub .text.*)
     *(.glue_7t) *(.glue_7) *(.vfp11_veneer) *(.v4_bx)
