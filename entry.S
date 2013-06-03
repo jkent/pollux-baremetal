@@ -105,17 +105,17 @@ _start:
 	blo     1b
 
 #if defined(CONFIG_BAREMETAL_BOOT_SOURCE_NAND)
-	ldr	r0, =__reloc_start__
+	ldr	r0, =__image_start__
 	blx	nand_startup
 #elif defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART)
-	ldr	r0, =__reloc_start__
+	ldr	r0, =__image_start__
 	blx	uart_startup
 #elif defined(CONFIG_BAREMETAL_RELOCATE)
 	adr	r0, _entry
 	ldr	r1, =__early_end__
 	add	r0, r0, r1
-	ldr	r1, =__reloc_start__
-	ldr	r2, =__reloc_end__
+	ldr	r1, =__image_start__
+	ldr	r2, =__image_end__
 1:
 	ldmia   r0!, {r10-r11}
 	stmia   r1!, {r10-r11}

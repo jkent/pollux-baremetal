@@ -16,6 +16,25 @@ config BAREMETAL_BOOT_SOURCE_NOR
 	depends on NOT_IMPLEMENTED
 endchoice
 
+choice BAREMETAL_NAND
+	prompt "NAND Type" if BAREMETAL_BOOT_SOURCE_NAND
+	default BAREMETAL_NAND_SB4 if DEVICE_NC600
+	default BAREMETAL_NAND_LB5 if DEVICE_EGOA732
+config BAREMETAL_NAND_SB3
+	bool "Small block, 3 address cycles"
+config BAREMETAL_NAND_SB4
+	bool "Small block, 4 address cycles"
+config BAREMETAL_NAND_LB4
+	bool "Large block, 4 address cycles"
+config BAREMETAL_NAND_LB5
+	bool "Large block, 5 address cycles"
+endchoice
+
+config BAREMETAL_NAND_PAGESIZE
+	hex "NAND page size" if BAREMETAL_BOOT_SOURCE_NAND
+	default 0x200 if DEVICE_NC600
+	default 0x1000 if DEVICE_EGOA732
+
 config BAREMETAL_SHADOW
 	bool "Shadow RAM" if BAREMETAL_BOOT_SOURCE_RAM
 	default y if BAREMETAL_BOOT_SOURCE_RAM

@@ -38,18 +38,19 @@ SECTIONS
     baremetal/early.o(.rodata .rodata.*)
 #endif
   }
-#if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) \
- || defined(CONFIG_BAREMETAL_BOOT_SOURCE_NAND)
+#if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART)
   . = ALIGN(0x4000);
+#elif defined(CONFIG_BAREMETAL_BOOT_SOURCE_NAND)
+  . = ALIGN(CONFIG_BAREMETAL_NAND_PAGESIZE);
 #else
   . = ALIGN(0x8);
 #endif
   __early_end__ = .;
 
-#if defined(CONFIG_BAREMETAL_RELOCATE)
+#if defined(CONFIG_BAREMETAL_LOAD_ADDRESS)
   . = CONFIG_BAREMETAL_LOAD_ADDRESS;
-  __reloc_start__ = .;
 #endif
+  __image_start__ = .;
   .text : AT(__early_end__) {
 #if defined(BUILD)
     BUILD/baremetal/startup.o(.text)
@@ -69,10 +70,14 @@ SECTIONS
   .data : {
     *(.data .data.*)
   }
+#if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART)
+  . = ALIGN(0x4000);
+#elif defined(CONFIG_BAREMETAL_BOOT_SOURCE_NAND)
+  . = ALIGN(CONFIG_BAREMETAL_NAND_PAGESIZE);
+#else
   . = ALIGN(0x8);
-#if defined(CONFIG_BAREMETAL_RELOCATE)
-  __reloc_end__ = .;
 #endif
+  __image_end__ = .;
 
   .bss : {
     __bss_start__ = .;
