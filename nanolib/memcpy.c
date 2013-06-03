@@ -15,20 +15,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <string.h>
+#include <stddef.h>
 
-void *memset(void *s, int c, size_t n)
+void *memcpy(void *dest, void *src, size_t n)
 {
-	unsigned char *p = (unsigned char *)s;
-	while (n--)
-		*p++ = (unsigned char)c;
-	return s;
-}
+	unsigned char *dst8 = (unsigned char *)dest;
+	unsigned char *src8 = (unsigned char *)src;
 
-size_t strlen(const char *s)
-{
-	size_t len = 0;
-	while (s[len++]);
-	return len;
+	while (n--) {
+		*dst8++ = *src8++;
+	}
+
+	return dest;
 }
 

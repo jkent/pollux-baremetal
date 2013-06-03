@@ -15,15 +15,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef	_STRING_H
-#define	_STRING_H
+#include <stdarg.h>
+#include <stdio.h>
 
-#include <stddef.h>
-
-void *memcpy(void *dest, const void *src, size_t n);
-void *memset (void *s, int c, size_t n);
-size_t strlen(const char *s);
-#define bzero(s, n) memset(s, 0, n)
-
-#endif /* _STRING_H */
+int printf(const char *fmt, ...)
+{
+	va_list va;
+	va_start(va, fmt);
+	vprintf(fmt, va);
+	va_end(va);
+	return 0;
+}
 

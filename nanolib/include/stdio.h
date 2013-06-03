@@ -18,6 +18,7 @@
 #ifndef _STDIO_H
 #define _STDIO_H
 
+#include <stdarg.h>
 #include <stdio.h>
 #include "config.h"
 
@@ -29,6 +30,7 @@
 #define stderr (void *)2
 
 int printf (const char *, ...);
+int vprintf(const char *fmt, va_list va);
 
 # define putchar(c) uart_putchar((char)c)
 # define puts(s) uart_puts(s)

@@ -15,9 +15,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <stdio.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 static int itoa(int value, char *s, unsigned int radix, bool uppercase, bool is_signed)
 {
@@ -127,15 +127,6 @@ int vprintf(const char *fmt, va_list va)
 				break;
 		}
 	}
-	return 0;
-}
-
-int printf(const char *fmt, ...)
-{
-	va_list va;
-	va_start(va, fmt);
-	vprintf(fmt, va);
-	va_end(va);
 	return 0;
 }
 
