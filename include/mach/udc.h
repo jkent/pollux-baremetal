@@ -31,6 +31,7 @@
 #define UDC_FNR				UDC_REG(0x08) /* Frame Number */
 #define UDC_EDR				UDC_REG(0x0a) /* EP Direction */
 #define UDC_TR				UDC_REG(0x0c) /* Test Register */
+#define UDC_TR_VBUS			(1 << 15)
 #define UDC_SSR				UDC_REG(0x0e) /* System Status */
 #define UDC_SSR_FLAGS			(0xff8f)
 #define UDC_SSR_ERR			(0xfc80)
