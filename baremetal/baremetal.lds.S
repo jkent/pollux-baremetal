@@ -1,0 +1,92 @@
+/*
+ * Copyright (C) 2013 Jeff Kent <jeff@jkent.net>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+#include "config.h"
+
+OUTPUT_FORMAT("elf32-littlearm", "elf32-littlearm", "elf32-littlearm")
+OUTPUT_ARCH(arm)
+ENTRY(_entry)
+
+SECTIONS
+{
+  . = CONFIG_BAREMETAL_ENTRY_ADDRESS;
+  __early_start__ = .;
+  .early : {
+    */entry.*(.text .stub .text.*)
+    */early.*(.text .stub .text.*)
+    */entry.*(.rodata .rodata.*)
+    */early.*(.rodata .rodata.*)
+  }
+#if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) \
+ || defined(CONFIG_BAREMETAL_BOOT_SOURCE_NAND)
+  . = ALIGN(0x4000);
+#else
+  . = ALIGN(0x8);
+#endif
+  __early_end__ = .;
+
+#if defined(CONFIG_BAREMETAL_RELOCATE)
+  . = CONFIG_BAREMETAL_LOAD_ADDRESS;
+  __reloc_start__ = .;
+#endif
+  .text : AT(__early_end__) {
+    */startup.*(.text)
+    *(.text.startup .text.startup.*)
+    *(.text .stub .text.*)
+    *(.glue_7t) *(.glue_7) *(.vfp11_veneer) *(.v4_bx)
+  }
+  .rodata : {
+    *(.rodata .rodata.*)
+  }
+  .got : {
+    *(.got.plt) *(.igot.plt) *(.got) *(.igot)
+  }
+  .data : {
+    *(.data .data.*)
+  }
+  . = ALIGN(0x8);
+#if defined(CONFIG_BAREMETAL_RELOCATE)
+  __reloc_end__ = .;
+#endif
+
+  .bss : {
+    __bss_start__ = .;
+    *(.bss .bss.*)
+    *(COMMON)
+#if defined(CONFIG_BAREMETAL_ENABLE_DCACHE)
+    main_tlb = ALIGN(0x4000);
+    . = main_tlb + 0x4000;
+#endif
+    . = ALIGN(0x4);
+    __bss_end__ = .;
+  }
+
+  .heap : {
+    __heap_start__ = .;
+    . += CONFIG_BAREMETAL_HEAP_SIZE;
+    . = ALIGN(0x4);
+    __heap_end__ = .;
+  }
+
+  .stack : {
+    __stack_end__ = .;
+    . += CONFIG_BAREMETAL_STACK_SIZE;
+    . = ALIGN(0x4);
+    __stack_top__ = .;
+  }
+}
+

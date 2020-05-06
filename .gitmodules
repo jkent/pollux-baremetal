@@ -1,0 +1,6 @@
+[submodule "tools/kconfig"]
+	path = tools/kconfig
+	url = https://github.com/ulfalizer/Kconfiglib.git
+[submodule "tools/micromon"]
+	path = tools/micromon
+	url = https://github.com/jkent/pollux-micromon

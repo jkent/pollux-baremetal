@@ -1,0 +1,1 @@
+source "$(BAREMETAL_PATH)/Kconfig"
