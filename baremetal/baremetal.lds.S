@@ -17,48 +17,58 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "config.h"
-
 OUTPUT_FORMAT("elf32-littlearm", "elf32-littlearm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 ENTRY(_entry)
 
+MEMORY
+{
+#if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) || defined(BAREMETAL_BOOT_SOURCE_NAND)
+  early : o = CONFIG_BAREMETAL_ENTRY_ADDRESS, l = 512
+#endif
+  
+#if defined(CONFIG_BAREMETAL_RELOCATE)
+  ram : o = CONFIG_BAREMETAL_RELOCATE_ADDRESS + 512, l = CONFIG_BAREMETAL_ENTRY_ADDRESS + 128M - 512 - CONFIG_BAREMETAL_RELOCATE_ADDRESS 
+#else
+  ram : o = CONFIG_BAREMETAL_ENTRY_ADDRESS + 512, l = 128M
+#endif
+}
+
 SECTIONS
 {
-	. = CONFIG_BAREMETAL_ENTRY_ADDRESS;
-	. = ALIGN(4);
+#if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) || defined(BAREMETAL_BOOT_SOURCE_NAND)
   __early_start__ = .;
 	.startup : { 
-    */baremetal/entry.*(.text .rodata .data)
-  }
+    */entry.*(.text.early .rodata.early)
+    *(.text.early .rodata.early)
+  } > early
+  . = ALIGN(512);
   __early_end__ = .;
+#endif
 
 #if defined(CONFIG_BAREMETAL_RELOCATE)
-  . = CONFIG_BAREMETAL_RELOCATE_ADDRESS;
-  __reloc_start__ = .;
-  . += __early_end__ - __early_start__;
+    __reloc_start__ = .;
 #endif
-	. = ALIGN(4);
-	.text : AT(ADDR(.startup) + SIZEOF(.startup))
-	{
-		/* early code and data must fit in the first 512 bytes */
-	  *(.text.early .rodata.early)
-    . = ALIGN(512);
+	.text : AT(__early_end__){
 
+#if !defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) && !defined(BAREMETAL_BOOT_SOURCE_NAND)
+    */entry.*(.text.early .rodata.early)
+    *(.text.early .rodata.early)
+#endif
 		*(.text .stub .text.*)
-	}
+	} > ram
 
 	.rodata : {
     *(.rodata)
-  }
+  } > ram
 
 	.got : {
     *(.got.plt) *(.igot.plt) *(.got) *(.igot)
-  }
+  } > ram
 
   .data : {
     *(.data .data.*)
-  }
+  } > ram
 
   .bss : {
     __bss_start__ = .;
@@ -68,25 +78,21 @@ SECTIONS
     main_tlb = ALIGN(0x4000);
     . = main_tlb + 0x4000;
 #endif
-    . = ALIGN(0x4);
     __bss_end__ = .;
-  }
+  } > ram
 
 #if defined(CONFIG_BAREMETAL_RELOCATE)
   __reloc_end__ = .;
 #endif
 
   __heap_start__ = .;
-#if defined(CONFIG_BAREMETAL_HEAP_STATIC)
-  . += CONFIG_BAREMETAL_HEAP_STATIC_SIZE;
-  . = ALIGN(0x4);
+#if defined(CONFIG_BAREMETAL_HEAP_FIXED)
+  . += CONFIG_BAREMETAL_HEAP_FIXED_SIZE;
   __heap_end__ = .;
 #endif
-
   __initial_stack_end__ = .;
   .stack : {
     . += CONFIG_BAREMETAL_INITIAL_STACK_SIZE;
-    . = ALIGN(0x4);
-  }
+  } > ram
   __initial_stack_top__ = .;
 }

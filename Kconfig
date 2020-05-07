@@ -6,6 +6,7 @@ choice BAREMETAL_BOOT_SOURCE
 	prompt "Boot source"
 config BAREMETAL_BOOT_SOURCE_RAM
 	bool "RAM"
+	depends on NOT_IMPLEMENTED
 config BAREMETAL_BOOT_SOURCE_UART
 	bool "UART boot"
 config BAREMETAL_BOOT_SOURCE_NAND
@@ -50,6 +51,15 @@ config BAREMETAL_RELOCATE_ADDRESS
 	range 0x00000000 0x07FFFFFF if BAREMETAL_SHADOW
 	range 0x80000000 0x87FFFFFF if !BAREMETAL_SHADOW
 
+config BAREMETAL_LATCH_POWER
+	bool "Latch power"
+	default y
+	help
+	  Say Y here to enable latching power in startup code.
+endmenu
+
+menu "Baremetal: runtime"
+
 config BAREMETAL_ENABLE_ICACHE
 	bool "Enable ICache"
 	default y
@@ -58,7 +68,7 @@ config BAREMETAL_ENABLE_ICACHE
 	  Say Y here to enable the instruction cache.  In almost all
 	  circumstances you want this.
 
-config BAREMETAL_ENABLE_DCACHE # remqove indent
+config BAREMETAL_ENABLE_DCACHE # remove indent
 config BAREMETAL_ENABLE_DCACHE
 	depends on BAREMETAL_ENABLE_ICACHE
 	bool "Enable DCache"
@@ -67,10 +77,8 @@ config BAREMETAL_ENABLE_DCACHE
 	  Say Y here to enable the data cache and MMU. The MMU is setup with a
 	  basic 1:1 memory map.
 
-config BAREMETAL_DDR_INIT
-	bool "Initialize DDR"
-	default y
-	select BAREMETAL_CLOCKING
+config BAREMETAL_CACHE
+	bool
 
 choice BAREMETAL_PLL0_INIT
 	prompt "Initialize PLL0"
@@ -86,57 +94,55 @@ config BAREMETAL_PLL0_INIT_533
 	select BAREMETAL_PLL0_INIT
 endchoice
 
-config BAREMETAL_PLL0_INIT
+config BAREMETAL_CLOCKING
 	bool
 
-endmenu
+config BAREMETAL_DDR_INIT
+	bool "Initialize DDR"
+	default y
+	select BAREMETAL_CLOCKING
 
-menu "Baremetal: runtime"
+
+config BAREMETAL_PLL0_INIT
+	bool
 
 config BAREMETAL_USE_NEWLIB
 	bool "Use Newlib C Library"
 	default y
 
-config BAREMETAL_STACK_DYNAMIC
-	bool "Place stack at the to of RAM"
-
 choice BAREMETAL_HEAP
 	prompt "Heap type"
+	default BAREMETAL_HEAP_FIXED if !BAREMETAL_USE_NEWLIB 
+	default BAREMETAL_HEAP_AUTO if BAREMETAL_USE_NEWLIB
 config BAREMETAL_HEAP_NONE
 	bool "None"
-config BAREMETAL_HEAP_STATIC
-	depends on BAREMETAL_USE_NEWLIB
-	bool "Static"
-config BAREMETAL_HEAP_DYNAMIC
-	depends on BAREMETAL_USE_NEWLIB
-	bool "Dynamic"
+config BAREMETAL_HEAP_FIXED
+	bool "Fixed"
+config BAREMETAL_HEAP_AUTO
+	bool "Auto"
 endchoice
 
-config BAREMETAL_HEAP_STATIC_SIZE
-	depends on BAREMETAL_HEAP_STATIC
-	hex "Static heap size"
+config BAREMETAL_HEAP_FIXED_SIZE
+	depends on BAREMETAL_HEAP_FIXED
+	hex "Fixed heap size"
 	default 0x40000
+
+config BAREMETAL_MOVE_STACK
+	bool "Move stack to the top of RAM"
 
 choice BAREMETAL_UART
 	prompt "UART implementation"
-config BAREMETAL_UART_BASIC
-	bool "basic"
-	select BAREMETAL_UART
+	default BAREMETAL_UART_FIFO if BAREMETAL_INTERRUPTS
+	default BAREMETAL_UART_POLLED if !BAREMETAL_INTERRUPTS
+config BAREMETAL_UART_NONE
+	bool "None"
+config BAREMETAL_UART_POLLED
+	bool "Polled"
+	depends on NOT_IMPLEMENTED
 config BAREMETAL_UART_FIFO
 	bool "FIFO"
 	depends on NOT_IMPLEMENTED
-	select BAREMETAL_UART
-config BAREMETAL_UART_NONE
-	bool "none"
+	depends on BAREMETAL_INTERRUPTS
 endchoice
-
-config BAREMETAL_UART
-	bool
-
-config BAREMETAL_CACHE
-	bool
-
-config BAREMETAL_CLOCKING
-	bool
 
 endmenu

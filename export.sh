@@ -75,7 +75,6 @@ function baremetal_export_main() {
 
     old_path="$PATH"
 
-    echo "Adding baremetal tools to PATH..."
     export PATH="$BAREMETAL_PATH/tools:$PATH"
     export PATH="$BAREMETAL_PATH/tools/kconfig/:$PATH"
     export PATH="$BAREMETAL_PATH/tools/micromon/:$PATH"
@@ -104,11 +103,10 @@ function baremetal_export_main() {
     unset path_prefix
     unset path_entry
 
+    echo
     echo "Done! You can now compile baremetal projects."
-    echo "Go to the project directory and run:"
-    echo ""
-    echo "  baremetal.py build"
-    echo ""
+    echo "Enter a project directory and run make"
+    echo
 }
 
 baremetal_export_main

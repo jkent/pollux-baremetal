@@ -22,15 +22,12 @@
 
 #include <asm/types.h>
 
-typedef struct lowlevel_uart_baudinfo_t lowlevel_uart_baudinfo_t;
-
-void lowlevel_uart_init(const lowlevel_uart_baudinfo_t *baudinfo);
-const lowlevel_uart_baudinfo_t *lowlevel_uart_find_baudinfo(u32 baudrate);
-u8 lowlevel_uart_getc(void);
-void lowlevel_uart_putc(u8 c);
-u16 lowlevel_uart_get_u16(void);
-void lowlevel_uart_put_u16(u16 n);
-u32 lowlevel_uart_get_u32(void);
-void lowlevel_uart_put_u32(u32 n);
+void lowlevel_uart_init(u32 baudinfo);
+u8 lowlevel_read_u8(void);
+void lowlevel_write_u8(u8 c);
+u16 lowlevel_read_u16(void);
+void lowlevel_write_u16(u16 n);
+u32 lowlevel_read_u32(void);
+void lowlevel_write_u32(u32 n);
 
 #endif /* __UART_H__ */

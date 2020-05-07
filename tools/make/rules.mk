@@ -36,7 +36,7 @@ CFLAGS   = -std=gnu99 -Wall -fms-extensions $(cflags-y)
 ASFLAGS := -Wa,-defsym,_entry=$(CONFIG_BAREMETAL_ENTRY_ADDRESS)
 LDFLAGS := -Wl,--gc-sections -Wl,-M,-Map,$(BUILD)/$(basename $(target)).map
 LIBS     = -lgcc $(libs-y)
-INCLUDE  = --include $(BUILD)/config.h $(addprefix -I,$(BUILD) $(includes))
+INCLUDE  = -include $(BUILD)/config.h $(addprefix -I,$(BUILD) $(includes))
 
 cflags-y += -mlittle-endian -msoft-float -mtune=arm9tdmi -march=armv5te -mthumb -mthumb-interwork -nostartfiles
 ldscript-y ?= baremetal/baremetal.lds
