@@ -77,6 +77,7 @@ function baremetal_export_main() {
 
     echo "Adding baremetal tools to PATH..."
     export PATH="$BAREMETAL_PATH/tools:$PATH"
+    export PATH="$BAREMETAL_PATH/tools/kconfig/:$PATH"
     export PATH="$BAREMETAL_PATH/tools/micromon/:$PATH"
 
     if [[ -n "$BASH" ]]

@@ -8,7 +8,6 @@ config BAREMETAL_BOOT_SOURCE_RAM
 	bool "RAM"
 config BAREMETAL_BOOT_SOURCE_UART
 	bool "UART boot"
-	depends on NOT_IMPLEMENTED
 config BAREMETAL_BOOT_SOURCE_NAND
 	bool "NAND flash"
 	depends on NOT_IMPLEMENTED
@@ -29,16 +28,9 @@ config BAREMETAL_SHADOW
 	  1GB memory spaces are reversed.  Under most circumstances you want
 	  this enabled.
 
-config BAREMETAL_LOAD_ADDRESS
-	hex "Load address" if !BAREMETAL_BOOT_SOURCE_RAM || BAREMETAL_RELOCATE
-	default 0x00800000 if BAREMETAL_SHADOW
-	default 0x80800000 if !BAREMETAL_SHADOW
-	range 0x00000000 0x07FFFFFF if BAREMETAL_SHADOW
-	range 0x80000000 0x87FFFFFF if !BAREMETAL_SHADOW
-
-config BAREMETAL_RELOCATE
-	bool "Relocate" if BAREMETAL_BOOT_SOURCE_RAM
-	default y if BAREMETAL_BOOT_SOURCE_RAM
+config BAREMETAL_INITIAL_STACK_SIZE
+	hex "Initial stack size"
+	default 0x40000
 
 config BAREMETAL_ENTRY_ADDRESS
 	hex "Entry address" if BAREMETAL_BOOT_SOURCE_RAM
@@ -47,9 +39,16 @@ config BAREMETAL_ENTRY_ADDRESS
 	range 0x00000000 0x07FFFFFF if BAREMETAL_SHADOW
 	range 0x80000000 0x87FFFFFF if !BAREMETAL_SHADOW
 
-config BAREMETAL_STACK_SIZE
-	hex "Stack size"
-	default 0x40000
+config BAREMETAL_RELOCATE
+	bool "Relocate"
+	default y if BAREMETAL_BOOT_SOURCE_RAM
+
+config BAREMETAL_RELOCATE_ADDRESS
+	hex "Relocate address" if !BAREMETAL_BOOT_SOURCE_RAM && BAREMETAL_RELOCATE
+	default 0x00800000 if BAREMETAL_SHADOW
+	default 0x80800000 if !BAREMETAL_SHADOW
+	range 0x00000000 0x07FFFFFF if BAREMETAL_SHADOW
+	range 0x80000000 0x87FFFFFF if !BAREMETAL_SHADOW
 
 config BAREMETAL_ENABLE_ICACHE
 	bool "Enable ICache"
@@ -98,9 +97,24 @@ config BAREMETAL_USE_NEWLIB
 	bool "Use Newlib C Library"
 	default y
 
-config BAREMETAL_HEAP_SIZE
+config BAREMETAL_STACK_DYNAMIC
+	bool "Place stack at the to of RAM"
+
+choice BAREMETAL_HEAP
+	prompt "Heap type"
+config BAREMETAL_HEAP_NONE
+	bool "None"
+config BAREMETAL_HEAP_STATIC
 	depends on BAREMETAL_USE_NEWLIB
-	hex "Newlib heap size (TODO: make dynamic)"
+	bool "Static"
+config BAREMETAL_HEAP_DYNAMIC
+	depends on BAREMETAL_USE_NEWLIB
+	bool "Dynamic"
+endchoice
+
+config BAREMETAL_HEAP_STATIC_SIZE
+	depends on BAREMETAL_HEAP_STATIC
+	hex "Static heap size"
 	default 0x40000
 
 choice BAREMETAL_UART

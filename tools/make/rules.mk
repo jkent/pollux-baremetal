@@ -20,8 +20,11 @@
 all:
 
 BASEDIR ?= $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
+BAREMETAL_RELATIVE_PATH := $(shell realpath --relative-to $(BASEDIR) $(BAREMETAL_PATH))
 BUILD := $(BASEDIR)/build
 -include $(BASEDIR)/.config
+
+includes += $(include-y)
 
 CROSS_COMPILE := arm-none-eabi-
 
@@ -38,13 +41,13 @@ OBJDUMP := $(CROSS_COMPILE)objdump
 SIZE    := $(CROSS_COMPILE)size
 
 CFLAGS   = -std=gnu99 -Wall -fms-extensions $(cflags-y)
-ASFLAGS := -Wa,--defsym,_entry=$(CONFIG_)
-LDFLAGS := -Wl,-M,-Map,$(BUILD)/$(basename $(target)).map
+ASFLAGS := -Wa,-defsym,_entry=$(CONFIG_BAREMETAL_ENTRY_ADDRESS)
+LDFLAGS := -Wl,--gc-sections -Wl,-M,-Map,$(BUILD)/$(basename $(target)).map
 LIBS     = -lgcc $(libs-y)
-INCLUDE  = --include $(BUILD)/config.h $(addprefix -I$(BASEDIR)/,$(BUILD) $(includes))
+INCLUDE  = --include $(BUILD)/config.h $(addprefix -I,$(BUILD) $(includes))
 
 cflags-y += -mlittle-endian -msoft-float -mtune=arm9tdmi -march=armv5te -mthumb -mthumb-interwork -nostartfiles
-ldscript-y := baremetal/baremetal.lds
+ldscript-y ?= baremetal/baremetal.lds
 
 ifdef CONFIG_DEBUG
   cflags-y += -O0 -g3 -DDEBUG
@@ -60,12 +63,13 @@ else
   Q := @
 endif
 
-includes :=
 objs :=
+
+includes := $(includes) $(include-y)
 define collect_baremetal
   include-y :=
-  subdir-y :=
   obj-y :=
+  subdir-y :=
   relative := $(shell realpath --relative-to $(BAREMETAL_PATH) $(1))
   include $(1)/Makefile
   includes := $$(includes) $$(addprefix $(1)/,$$(include-y))
@@ -78,8 +82,8 @@ endef
 
 define collect_project
   include-y :=
-  subdir-y :=
   obj-y :=
+  subdir-y :=
   include $(BASEDIR)/$(1)/Makefile
   includes := $$(includes) $$(addprefix $(1)/,$$(include-y))
   objs := $$(objs) $$(addprefix $(BUILD)/$(1)/,$$(obj-y))
@@ -89,9 +93,8 @@ define collect_project
   )
 endef
 
-
 $(eval $(call collect_baremetal,$(BAREMETAL_PATH)))
-dirs :=
+srcdirs ?= src
 $(foreach dir,$(srcdirs),\
 	$(eval $(call collect_project,$(dir)))\
 )
@@ -99,16 +102,15 @@ $(foreach dir,$(srcdirs),\
 all: $(BUILD)/$(target)
 	@$(MAKE) -s -f $(firstword $(MAKEFILE_LIST)) deps
 
--include $(BUILD)/deps.mk
-
 .PHONY: deps
 deps:
 	@rm -f $(BUILD)/deps.mk
-	@$(foreach dir,$(dirs),\
+	@$(foreach dir,$(BAREMETAL_PATH) $(srcdirs),\
 	  $(foreach file,$(wildcard $(BUILD)/$(dir)/*.d),\
 	    cat $(file) >> $(BUILD)/deps.mk;\
 	  )\
 	)
+-include $(BUILD)/deps.mk
 
 .PRECIOUS: $(BUILD)/. $(BUILD)%/.
 $(BUILD)/.:
@@ -117,55 +119,68 @@ $(BUILD)%/.:
 	$(Q)mkdir -p $@
 .SECONDEXPANSION:
 
-compile_deps := $$(@D)/. $(BUILD)/config.h
+DEPS := $$(@D)/. $(BUILD)/config.h
 
-$(BASEDIR)/.config:
-	$(Q)$(BAREMETAL_PATH)/tools/kconfig/menuconfig.py
-
+.PHONY: config
+$(BASEDIR)/.config config:
+	$(Q)if [ -f $(BASEDIR)/.config -o ! -f $(BASEDIR)/defconfig ]; then \
+		menuconfig.py || touch $(BASEDIR)/.config; \
+	else \
+		defconfig.py $(BASEDIR)/defconfig; \
+	fi
+	
 $(BUILD)/config.h: $(BASEDIR)/.config | $$(@D)/.
-	$(Q)$(BAREMETAL_PATH)/tools/kconfig/genconfig.py --header-path $@
+	$(Q)genconfig.py --header-path $@
 
-$(BUILD)/%.lds: $(BASEDIR)/%.lds.S | $(compile_deps)
+$(BUILD)/%.lds: $(BASEDIR)/%.lds.S | $(DEPS)
 	$(D) "   CPP      $<"
 	$(Q)$(CPP) -P -MMD -MP -MF $@.d -MQ $@ -x c -DBUILD=$(BUILD:./%=%) $(INCLUDE) $< -o $@
 
-$(BUILD)/%.lds: $(BAREMETAL_PATH)/%.lds.S | $(compile_deps)
+$(BUILD)/%.lds: $(BAREMETAL_RELATIVE_PATH)/%.lds.S | $(DEPS)
 	$(D) "   CPP      $<"
 	$(Q)$(CPP) -P -MMD -MP -MF $@.d -MQ $@ -x c -DBUILD=$(BUILD:./%=%) $(INCLUDE) $< -o $@
 
-$(BUILD)/%.o: $(BASEDIR)/%.S | $$(@D)/. $(BUILD)/config.h
+$(BUILD)/%.o: $(BASEDIR)/%.S | $(DEPS)
 	$(D) "   AS       $<"
 	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(ASFLAGS) $(INCLUDE) $< -o $@
 
-$(BUILD)/%.o: $(BAREMETAL_PATH)/%.S | $(compile_deps)
+$(BUILD)/%.o: $(BAREMETAL_RELATIVE_PATH)/%.S | $(DEPS)
+	$(Q) mkdir -p $(@D)
 	$(D) "   AS       $<"
 	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(ASFLAGS) $(INCLUDE) $< -o $@
 
-$(BUILD)/%.o: $(BASEDIR)/%.c | $(compile_deps)
+$(BUILD)/%.o: $(BASEDIR)/%.c | $(DEPS)
+	$(Q) mkdir -p $(@D)
 	$(D) "   CC       $<"
 	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(INCLUDE) $< -o $@
 
-$(BUILD)/%.o: $(BAREMETAL_PATH)/%.c | $(compile_deps)
+$(BUILD)/%.o: $(BAREMETAL_RELATIVE_PATH)/%.c | $(DEPS)
+	$(Q) mkdir -p $(@D)
 	$(D) "   CC       $<"
 	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(INCLUDE) $< -o $@
 
-$(BUILD)/%.o: $(BASEDIR)/%.cpp | $(compile_deps)
+$(BUILD)/%.o: $(BASEDIR)/%.cpp | $(DEPS)
+	$(Q) mkdir -p $(@D)
 	$(D) "   CXX      $<"
-	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(INCLUDE) $< -o $@
+	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(CXXFLAGS) $(INCLUDE) $< -o $@
 
-$(BUILD)/%.o: $(BAREMETAL_PATH)/%.cpp | $(compile_deps)
+$(BUILD)/%.o: $(BAREMETAL_RELATIVE_PATH)/%.cpp | $(DEPS)
+	$(Q) mkdir -p $(@D)
 	$(D) "   CXX      $<"
-	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(INCLUDE) $< -o $@
+	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(CXXFLAGS) $(INCLUDE) $< -o $@
 
-$(BUILD)/%.o: $(BASEDIR)/%.cc | $(compile_deps)
+$(BUILD)/%.o: $(BASEDIR)/%.cc | $(DEPS)
+	$(Q) mkdir -p $(@D)
 	$(D) "   CXX      $<"
-	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(INCLUDE) $< -o $@
+	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(CXXFLAGS) $(INCLUDE) $< -o $@
 
-$(BUILD)/%.o: $(BAREMETAL_PATH)/%.cc | $(compile_deps)
+$(BUILD)/%.o: $(BAREMETAL_RELATIVE_PATH)/%.cc | $(DEPS)
+	$(Q) mkdir -p $(@D)
 	$(D) "   CXX      $<"
-	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(INCLUDE) $< -o $@
+	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(CXXFLAGS) $(INCLUDE) $< -o $@
 
 $(BUILD)/$(basename $(target)).elf: $(BUILD)/$(ldscript-y) $(objs) | $$(@D)/.
+	$(Q) mkdir -p $(@D)
 	$(D) "   LD       $<"
 	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -T $^ $(LIBS) -o $@
 
