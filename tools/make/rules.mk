@@ -32,7 +32,7 @@ AS      := $(CROSS_COMPILE)as
 LD      := $(CROSS_COMPILE)ld
 CC      := $(CROSS_COMPILE)gcc
 CXX     := $(CROSS_COMPILE)g++
-CPP     := $(CC) -E
+CPP     := $(CROSS_COMPILE)gcc -E
 AR      := $(CROSS_COMPILE)ar
 NM      := $(CROSS_COMPILE)nm
 STRIP   := $(CROSS_COMPILE)strip
@@ -102,16 +102,15 @@ $(foreach dir,$(srcdirs),\
 all: $(BUILD)/$(target)
 	@$(MAKE) -s -f $(firstword $(MAKEFILE_LIST)) deps
 
+# dependency generation
 .PHONY: deps
-deps:
+deps: $(BUILD)/.
 	@rm -f $(BUILD)/deps.mk
-	@$(foreach dir,$(BAREMETAL_PATH) $(srcdirs),\
-	  $(foreach file,$(wildcard $(BUILD)/$(dir)/*.d),\
-	    cat $(file) >> $(BUILD)/deps.mk;\
-	  )\
-	)
+	@find $(BAREMETAL_PATH) -name \*.d -type f -exec sh -c 'cat {} >> $(BUILD)/deps.mk' \;
+	@find $(BUILD) -name \*.d -type f -exec sh -c 'cat {} >> $(BUILD)/deps.mk' \;
 -include $(BUILD)/deps.mk
 
+# magic to automatically create $(BUILD) directory
 .PRECIOUS: $(BUILD)/. $(BUILD)%/.
 $(BUILD)/.:
 	$(Q)mkdir -p $@
@@ -128,56 +127,37 @@ $(BASEDIR)/.config config:
 	else \
 		defconfig.py $(BASEDIR)/defconfig; \
 	fi
-	
+
+define make_build_rules
+$$(BUILD)/%.lds: $(1)/%.lds.S | $$(DEPS)
+	$$(D) "   CPP      $$<"
+	$$(Q)$$(CPP) -P -MMD -MP -MF $$@.d -MQ $$@ -x c -DBUILD=$$(BUILD:./%=%) $$(INCLUDE) $$< -o $$@
+
+$$(BUILD)/%.o: $(1)/%.S | $$(DEPS)
+	$$(D) "   AS       $$<"
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(ASFLAGS) $$(INCLUDE) $$< -o $$@
+
+$$(BUILD)/%.o: $(1)/%.c | $$(DEPS)
+	$$(Q) mkdir -p $$(@D)
+	$$(D) "   CC       $$<"
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(INCLUDE) $$< -o $$@
+
+$$(BUILD)/%.o: $(1)/%.cpp | $$(DEPS)
+	$$(Q) mkdir -p $$(@D)
+	$$(D) "   CXX      $$<"
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
+
+$$(BUILD)/%.o: $(1)/%.cc | $$(DEPS)
+	$$(Q) mkdir -p $$(@D)
+	$$(D) "   CXX      $$<"
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
+endef
+
+$(eval $(call make_build_rules,$(BASEDIR)))
+$(eval $(call make_build_rules,$(BAREMETAL_RELATIVE_PATH)))
+
 $(BUILD)/config.h: $(BASEDIR)/.config | $$(@D)/.
 	$(Q)genconfig.py --header-path $@
-
-$(BUILD)/%.lds: $(BASEDIR)/%.lds.S | $(DEPS)
-	$(D) "   CPP      $<"
-	$(Q)$(CPP) -P -MMD -MP -MF $@.d -MQ $@ -x c -DBUILD=$(BUILD:./%=%) $(INCLUDE) $< -o $@
-
-$(BUILD)/%.lds: $(BAREMETAL_RELATIVE_PATH)/%.lds.S | $(DEPS)
-	$(D) "   CPP      $<"
-	$(Q)$(CPP) -P -MMD -MP -MF $@.d -MQ $@ -x c -DBUILD=$(BUILD:./%=%) $(INCLUDE) $< -o $@
-
-$(BUILD)/%.o: $(BASEDIR)/%.S | $(DEPS)
-	$(D) "   AS       $<"
-	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(ASFLAGS) $(INCLUDE) $< -o $@
-
-$(BUILD)/%.o: $(BAREMETAL_RELATIVE_PATH)/%.S | $(DEPS)
-	$(Q) mkdir -p $(@D)
-	$(D) "   AS       $<"
-	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(ASFLAGS) $(INCLUDE) $< -o $@
-
-$(BUILD)/%.o: $(BASEDIR)/%.c | $(DEPS)
-	$(Q) mkdir -p $(@D)
-	$(D) "   CC       $<"
-	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(INCLUDE) $< -o $@
-
-$(BUILD)/%.o: $(BAREMETAL_RELATIVE_PATH)/%.c | $(DEPS)
-	$(Q) mkdir -p $(@D)
-	$(D) "   CC       $<"
-	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(INCLUDE) $< -o $@
-
-$(BUILD)/%.o: $(BASEDIR)/%.cpp | $(DEPS)
-	$(Q) mkdir -p $(@D)
-	$(D) "   CXX      $<"
-	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(CXXFLAGS) $(INCLUDE) $< -o $@
-
-$(BUILD)/%.o: $(BAREMETAL_RELATIVE_PATH)/%.cpp | $(DEPS)
-	$(Q) mkdir -p $(@D)
-	$(D) "   CXX      $<"
-	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(CXXFLAGS) $(INCLUDE) $< -o $@
-
-$(BUILD)/%.o: $(BASEDIR)/%.cc | $(DEPS)
-	$(Q) mkdir -p $(@D)
-	$(D) "   CXX      $<"
-	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(CXXFLAGS) $(INCLUDE) $< -o $@
-
-$(BUILD)/%.o: $(BAREMETAL_RELATIVE_PATH)/%.cc | $(DEPS)
-	$(Q) mkdir -p $(@D)
-	$(D) "   CXX      $<"
-	$(Q)$(CC) -c -MMD -MP -MF $@.d -MQ $@ $(CFLAGS) $(CXXFLAGS) $(INCLUDE) $< -o $@
 
 $(BUILD)/$(basename $(target)).elf: $(BUILD)/$(ldscript-y) $(objs) | $$(@D)/.
 	$(Q) mkdir -p $(@D)

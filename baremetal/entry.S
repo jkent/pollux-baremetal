@@ -18,6 +18,7 @@
  */
 
 #include "config.h"
+
 .section .text
 .arm
 .align 0
