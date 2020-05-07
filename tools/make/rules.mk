@@ -15,6 +15,9 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
+ifndef RECURSIVE_INCLUDE
+RECURSIVE_INCLUDE := 1
+
 # default rule
 .PHONY: all
 all:
@@ -24,21 +27,10 @@ BAREMETAL_RELATIVE_PATH := $(shell realpath --relative-to $(BASEDIR) $(BAREMETAL
 BUILD := $(BASEDIR)/build
 -include $(BASEDIR)/.config
 
-includes += $(include-y)
-
-CROSS_COMPILE := arm-none-eabi-
-
-AS      := $(CROSS_COMPILE)as
-LD      := $(CROSS_COMPILE)ld
-CC      := $(CROSS_COMPILE)gcc
-CXX     := $(CROSS_COMPILE)g++
-CPP     := $(CROSS_COMPILE)gcc -E
-AR      := $(CROSS_COMPILE)ar
-NM      := $(CROSS_COMPILE)nm
-STRIP   := $(CROSS_COMPILE)strip
-OBJCOPY := $(CROSS_COMPILE)objcopy
-OBJDUMP := $(CROSS_COMPILE)objdump
-SIZE    := $(CROSS_COMPILE)size
+CC      := arm-none-eabi-gcc
+OBJCOPY := arm-none-eabi-objcopy
+OBJDUMP := arm-none-eabi-objdump
+SIZE    := arm-none-eabi-size
 
 CFLAGS   = -std=gnu99 -Wall -fms-extensions $(cflags-y)
 ASFLAGS := -Wa,-defsym,_entry=$(CONFIG_BAREMETAL_ENTRY_ADDRESS)
@@ -55,6 +47,26 @@ else
   cflags-y += -Os
 endif
 
+# traverse directories for variables
+includes := 
+objs :=
+dirs :=
+define collect_vars
+  include-y :=
+  obj-y :=
+  subdir-y :=
+  relative := $(shell realpath --relative-to $(if $2,$2,$1) $1)
+  include $1/Makefile
+  includes := $$(includes) $$(addprefix $1/,$$(include-y))
+  objs := $$(objs) $$(addprefix $(BUILD)/$$(relative)/,$$(obj-y))
+  $$(foreach dir,$$(subdir-y),\
+    $$(eval dirs += $1/$$(dir))\
+    $$(eval $$(call collect_vars,$(1)/$$(dir),$(if $2,$2,$1)))\
+  )
+endef
+$(eval $(call collect_vars,$(BAREMETAL_PATH)))
+$(eval $(call collect_vars,$(BASEDIR)))
+
 ifeq ($(V),1)
   D := @true
   Q :=
@@ -63,51 +75,15 @@ else
   Q := @
 endif
 
-objs :=
-
-includes := $(includes) $(include-y)
-define collect_baremetal
-  include-y :=
-  obj-y :=
-  subdir-y :=
-  relative := $(shell realpath --relative-to $(BAREMETAL_PATH) $(1))
-  include $(1)/Makefile
-  includes := $$(includes) $$(addprefix $(1)/,$$(include-y))
-  objs := $$(objs) $$(addprefix $(BUILD)/$$(relative)/,$$(obj-y))
-  $$(foreach dir,$$(subdir-y),\
-    $$(eval dirs += $(1)/$$(dir))\
-    $$(eval $$(call collect_baremetal,$(1)/$$(dir)))\
-  )
-endef
-
-define collect_project
-  include-y :=
-  obj-y :=
-  subdir-y :=
-  include $(BASEDIR)/$(1)/Makefile
-  includes := $$(includes) $$(addprefix $(1)/,$$(include-y))
-  objs := $$(objs) $$(addprefix $(BUILD)/$(1)/,$$(obj-y))
-  $$(foreach dir,$$(subdir-y),\
-    $$(eval dirs += $(1)/$$(dir))\
-    $$(eval $$(call collect_project,$(1)/$$(dir)))\
-  )
-endef
-
-$(eval $(call collect_baremetal,$(BAREMETAL_PATH)))
-srcdirs ?= src
-$(foreach dir,$(srcdirs),\
-	$(eval $(call collect_project,$(dir)))\
-)
-
 all: $(BUILD)/$(target)
-	@$(MAKE) -s -f $(firstword $(MAKEFILE_LIST)) deps
+	$(Q)$(MAKE) -s -f $(firstword $(MAKEFILE_LIST)) deps
 
 # dependency generation
 .PHONY: deps
 deps: $(BUILD)/.
-	@rm -f $(BUILD)/deps.mk
-	@find $(BAREMETAL_PATH) -name \*.d -type f -exec sh -c 'cat {} >> $(BUILD)/deps.mk' \;
-	@find $(BUILD) -name \*.d -type f -exec sh -c 'cat {} >> $(BUILD)/deps.mk' \;
+	$(Q)rm -f $(BUILD)/deps.mk
+	$(Q)find $(BAREMETAL_PATH) -name \*.d -type f -exec sh -c 'cat {} >> $(BUILD)/deps.mk' \;
+	$(Q)find $(BUILD) -name \*.d -type f -exec sh -c 'cat {} >> $(BUILD)/deps.mk' \;
 -include $(BUILD)/deps.mk
 
 # magic to automatically create $(BUILD) directory
@@ -128,10 +104,10 @@ $(BASEDIR)/.config config:
 		defconfig.py $(BASEDIR)/defconfig; \
 	fi
 
-define make_build_rules
+define generate_rules
 $$(BUILD)/%.lds: $(1)/%.lds.S | $$(DEPS)
 	$$(D) "   CPP      $$<"
-	$$(Q)$$(CPP) -P -MMD -MP -MF $$@.d -MQ $$@ -x c -DBUILD=$$(BUILD:./%=%) $$(INCLUDE) $$< -o $$@
+	$$(Q)$$(CC) -E -P -MMD -MP -MF $$@.d -MQ $$@ -x c -DBUILD=$$(BUILD:./%=%) $$(INCLUDE) $$< -o $$@
 
 $$(BUILD)/%.o: $(1)/%.S | $$(DEPS)
 	$$(D) "   AS       $$<"
@@ -153,8 +129,8 @@ $$(BUILD)/%.o: $(1)/%.cc | $$(DEPS)
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
 endef
 
-$(eval $(call make_build_rules,$(BASEDIR)))
-$(eval $(call make_build_rules,$(BAREMETAL_RELATIVE_PATH)))
+$(eval $(call generate_rules,$(BASEDIR)))
+$(eval $(call generate_rules,$(BAREMETAL_RELATIVE_PATH)))
 
 $(BUILD)/config.h: $(BASEDIR)/.config | $$(@D)/.
 	$(Q)genconfig.py --header-path $@
@@ -180,3 +156,5 @@ clean:
 .PHONY: boot
 boot: $(BUILD)/$(target)
 	${MICROMON_PATH}/bootstrap.py $< 115200
+
+endif
