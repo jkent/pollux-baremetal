@@ -15,8 +15,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __BAREMETAL_UTIL_H
-#define __BAREMETAL_UTIL_H
+#pragma once
 
 #include "asm/types.h"
 #include "linux/stddef.h"
@@ -60,6 +59,7 @@
 	const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
 	(type *)( (char *)__mptr - offsetof(type,member) );})
 
+void main(void);
 void __attribute__((noreturn)) halt(void);
 
 static inline void __attribute__((always_inline)) enable_interrupts(void)
@@ -79,7 +79,3 @@ static inline void __attribute__((always_inline)) disable_interrupts(void)
 	n |= 0x80;
 	asm("msr r0, cpsr_c\n\t"::"r"(n));
 }
-
-
-#endif /* __BAREMETAL_UTIL_H */
-

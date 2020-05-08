@@ -35,8 +35,9 @@ CXXFLAGS :=
 LDFLAGS := -Wl,--gc-sections -Wl,-M,-Map,$(BUILD)/$(basename $(target)).map
 LIBS     = -lgcc $(libs-y)
 INCLUDE  = -include $(BUILD)/config.h $(addprefix -I,$(BUILD) $(includes))
+INSTRUCTION_SET := -mthumb
 
-cflags-y += -mlittle-endian -msoft-float -mtune=arm9tdmi -march=armv5te -mthumb -mthumb-interwork -nostartfiles
+cflags-y += -mlittle-endian -msoft-float -mtune=arm9tdmi -march=armv5te -mthumb-interwork -nostartfiles
 
 ifdef CONFIG_DEBUG
   cflags-y += -O0 -g3 -DDEBUG
@@ -113,22 +114,37 @@ $$(BUILD)/%.lds: $(1)/%.lds.S | $$(DEPS)
 
 $$(BUILD)/%.o: $(1)/%.S | $$(DEPS)
 	$$(D) "   AS       $$<"
-	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(ASFLAGS) $$(INCLUDE) $$< -o $$@
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $(INSTRUCTION_SET) $$(ASFLAGS) $$(INCLUDE) $$< -o $$@
+
+$$(BUILD)/%.arm.o: $(1)/%.arm.c | $$(DEPS)
+	$$(Q) mkdir -p $$(@D)
+	$$(D) "   CC       $$<"
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -marm $$(INCLUDE) $$< -o $$@
 
 $$(BUILD)/%.o: $(1)/%.c | $$(DEPS)
 	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CC       $$<"
-	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(INCLUDE) $$< -o $$@
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -mthumb $$(INCLUDE) $$< -o $$@
+
+$$(BUILD)/%.o: $(1)/%.c | $$(DEPS)
+	$$(Q) mkdir -p $$(@D)
+	$$(D) "   CC       $$<"
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $(INSTRUCTION_SET) $$(INCLUDE) $$< -o $$@
+
+$$(BUILD)/%.arm.o: $(1)/%.arm.cpp | $$(DEPS)
+	$$(Q) mkdir -p $$(@D)
+	$$(D) "   CXX      $$<"
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -marm $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
+
+$$(BUILD)/%.thumb.o: $(1)/%.thumb.cpp | $$(DEPS)
+	$$(Q) mkdir -p $$(@D)
+	$$(D) "   CXX      $$<"
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -thumb $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
 
 $$(BUILD)/%.o: $(1)/%.cpp | $$(DEPS)
 	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CXX      $$<"
-	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
-
-$$(BUILD)/%.o: $(1)/%.cc | $$(DEPS)
-	$$(Q) mkdir -p $$(@D)
-	$$(D) "   CXX      $$<"
-	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $(INSTRUCTION_SET) $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
 endef
 
 $(eval $(call generate_rules,$(BASEDIR)))

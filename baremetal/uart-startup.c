@@ -19,6 +19,7 @@
 #include <asm/attributes.h>
 #include <asm/io.h>
 #include <driver/lowlevel_uart.h>
+#include <baremetal/util.h>
 #include <mach/alive.h>
 #include <stddef.h>
 
@@ -29,7 +30,9 @@ static void startup_latch_power(void);
 #endif
 static void startup_set_baudrate(void);
 static void startup_load_rest(void);
-void main(void);
+#ifdef CONFIG_BAREMETAL_USE_RUNTIME_CODE
+void runtime(void);
+#endif
 
 EARLY_CODE NAKED void startup(void)
 {
@@ -40,10 +43,13 @@ EARLY_CODE NAKED void startup(void)
 	lowlevel_write_u32(STARTUP_SIGNATURE);
 	startup_set_baudrate();
 	startup_load_rest();
-	main();
 
-	/* Never return */
-	while(1);	
+#if defined(CONFIG_BAREMETAL_USE_RUNTIME_CODE)
+	runtime();
+#else
+	main();
+#endif
+	halt();
 }
 
 #if defined(CONFIG_BAREMETAL_LATCH_POWER)
@@ -78,7 +84,7 @@ EARLY_CODE static void startup_load_rest(void)
 	void *start = (void *)(readw(0xA4000000) & 0x400 ? 16384 : 512);
 	u32 size = lowlevel_read_u32();
 
-#if CONFIG_BAREMETAL_RELOCATE
+#if defined(CONFIG_BAREMETAL_RELOCATE)
 	start += CONFIG_BAREMETAL_RELOCATE_ADDRESS;
 #endif
 

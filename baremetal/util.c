@@ -16,19 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <asm/attributes.h>
-#include <baremetal/util.h>
-
-#ifdef CONFIG_BAREMETAL_USE_RUNTIME_CODE
-void runtime(void);
-#endif
-
-EARLY_CODE NAKED void startup(void)
+__attribute__((weak,noreturn))
+void halt(void)
 {
-#ifdef CONFIG_BAREMETAL_USE_RUNTIME_CODE
-	runtime();
-#else
-	main();
-#endif
-	halt();
+    while(1)
+        ;
 }

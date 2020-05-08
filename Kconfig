@@ -71,7 +71,7 @@ endif
 
 config BAREMETAL_USE_RUNTIME_CODE
 menuconfig BAREMETAL_USE_RUNTIME_CODE
-	depends on BAREMETAL_USE_ENTRY_CODE
+	depends on BAREMETAL_USE_STARTUP_CODE
 	bool "Use baremetal runtime code"
 	default y
 
@@ -79,22 +79,24 @@ if BAREMETAL_USE_RUNTIME_CODE
 config BAREMETAL_ENABLE_ICACHE
 	bool "Enable ICache"
 	default y
-	select BAREMETAL_CACHE
 	help
 	  Say Y here to enable the instruction cache.  In almost all
 	  circumstances you want this.
 
-config BAREMETAL_ENABLE_DCACHE # remove indent
+config BAREMETAL_ENABLE_MMU
+	bool "Enable MMU"
+	default y
+	help
+	  Say Y here to enable the MMU, setup with a basic 1:1 mmemory map.
+
 config BAREMETAL_ENABLE_DCACHE
-	depends on BAREMETAL_ENABLE_ICACHE
+config BAREMETAL_ENABLE_DCACHE
+	depends on BAREMETAL_ENABLE_MMU
 	bool "Enable DCache"
 	default y
 	help
-	  Say Y here to enable the data cache and MMU. The MMU is setup with a
-	  basic 1:1 memory map.
+	  Say Y here to enable the data cache.
 
-config BAREMETAL_CACHE
-	bool
 
 choice BAREMETAL_PLL0_INIT
 	prompt "Initialize PLL0"
@@ -103,7 +105,7 @@ choice BAREMETAL_PLL0_INIT
 	help
 	  PLL0 is the clock source for the ARM9 CPU. It is initially 384 MHz.
 config BAREMETAL_PLL0_INIT_NONE
-	bool "none"
+	bool "None"
 config BAREMETAL_PLL0_INIT_533
 	bool "533 MHz"
 	select BAREMETAL_CLOCKING

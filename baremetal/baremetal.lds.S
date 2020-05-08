@@ -74,7 +74,7 @@ SECTIONS
     __bss_start__ = .;
     *(.bss .bss.*)
     *(COMMON)
-#if defined(CONFIG_BAREMETAL_ENABLE_DCACHE)
+#if defined(CONFIG_BAREMETAL_ENABLE_MMU)
     main_tlb = ALIGN(0x4000);
     . = main_tlb + 0x4000;
 #endif

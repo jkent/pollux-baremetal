@@ -16,19 +16,23 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <asm/attributes.h>
+#include <baremetal/cache.h>
+#include <baremetal/mmu.h>
 #include <baremetal/util.h>
 
-#ifdef CONFIG_BAREMETAL_USE_RUNTIME_CODE
-void runtime(void);
-#endif
-
-EARLY_CODE NAKED void startup(void)
+void runtime(void)
 {
-#ifdef CONFIG_BAREMETAL_USE_RUNTIME_CODE
-	runtime();
-#else
-	main();
+#if defined(CONFIG_BAREMETAL_ENABLE_ICACHE)
+    icache_enable();
 #endif
-	halt();
+#if defined(CONIFG_BAREMETAL_ENABLE_MMU)
+    init_tlb(main_tlb);
+    assign_tlb(main_tlb);
+    mmu_enable()
+#endif
+#if defined(CONFIG_BAREMETAL_ENABLE_DCACHE)
+    dcache_enable();
+#endif
+    main();
+    halt();
 }

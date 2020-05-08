@@ -15,16 +15,31 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#pragma once
+#include <asm/types.h>
 
-#include <stdbool.h>
+#define CR_M (1 << 0) /* enable MMU */
 
-extern void *main_tlb;
+void mmu_assign_tlb(u32 *tlb)
+{
+	/* set domain 0 for unchecked access (manager) */
+    asm("mov r1, #3\n\t"
+        "mcr p15, 0, r1, c3, c0, 0" ::: "r1");
 
-extern void icache_invalidate(void);
-extern void icache_enable(void);
-extern void icache_disable(void);
+    asm("mcr p15, 0, %0, c2, c0, 0" : "=r" (tlb));
+}
 
-extern void dcache_invalidate(void);
-extern void dcache_enable(void);
-extern void dcache_disable(void);
+void mmu_enable(void)
+{
+	u32 cr;
+	asm("mrc p15, 0, %0, c1, c0, 0" : "=r" (cr) :: "cc");
+	cr |= CR_M;
+	asm("mcr p15, 0, %0, c1, c0, 0" :: "r" (cr));
+}
+
+void mmu_disable(void)
+{
+	u32 cr;
+	asm("mrc p15, 0, %0, c1, c0, 0" : "=r" (cr) :: "cc");
+	cr &= ~CR_M;
+	asm("mcr p15, 0, %0, c1, c0, 0" :: "r" (cr));
+}
