@@ -23,38 +23,23 @@ ENTRY(_entry)
 
 MEMORY
 {
-#if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) || defined(BAREMETAL_BOOT_SOURCE_NAND)
-  early : o = CONFIG_BAREMETAL_ENTRY_ADDRESS, l = 512
-#endif
-  
 #if defined(CONFIG_BAREMETAL_RELOCATE)
-  ram : o = CONFIG_BAREMETAL_RELOCATE_ADDRESS + 512, l = CONFIG_BAREMETAL_ENTRY_ADDRESS + 128M - 512 - CONFIG_BAREMETAL_RELOCATE_ADDRESS 
+  ram : o = CONFIG_BAREMETAL_RELOCATE_ADDRESS, l = CONFIG_BAREMETAL_ENTRY_ADDRESS + 128M - CONFIG_BAREMETAL_RELOCATE_ADDRESS 
 #else
-  ram : o = CONFIG_BAREMETAL_ENTRY_ADDRESS + 512, l = 128M
+  ram : o = CONFIG_BAREMETAL_ENTRY_ADDRESS, l = 128M
 #endif
 }
 
 SECTIONS
 {
-#if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) || defined(BAREMETAL_BOOT_SOURCE_NAND)
-  __early_start__ = .;
-	.startup : { 
-    */entry.*(.text.early .rodata.early)
-    *(.text.early .rodata.early)
-  } > early
-  . = ALIGN(512);
-  __early_end__ = .;
-#endif
-
-#if defined(CONFIG_BAREMETAL_RELOCATE)
+  .text : AT(CONFIG_BAREMETAL_ENTRY_ADDRESS) {
     __reloc_start__ = .;
-#endif
-	.text : AT(__early_end__){
-
-#if !defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) && !defined(BAREMETAL_BOOT_SOURCE_NAND)
     */entry.*(.text.early .rodata.early)
     *(.text.early .rodata.early)
+#if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) || defined(BAREMETAL_BOOT_SOURCE_NAND)
+    . = ALIGN(512);
 #endif
+
 		*(.text .stub .text.*)
 	} > ram
 
@@ -90,6 +75,7 @@ SECTIONS
   . += CONFIG_BAREMETAL_HEAP_FIXED_SIZE;
   __heap_end__ = .;
 #endif
+
   __initial_stack_end__ = .;
   .stack : {
     . += CONFIG_BAREMETAL_INITIAL_STACK_SIZE;

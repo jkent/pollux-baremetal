@@ -28,12 +28,13 @@ _entry:
 _start:
 
 #if defined(CONFIG_BAREMETAL_RELOCATE)
-
-#if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART)
 	/* relocate to high memory */
-	ldr	r0, =__early_start__
+	ldr	r0, =CONFIG_BAREMETAL_ENTRY_ADDRESS
 	ldr r1, =__reloc_start__
-	ldr r2, =__early_start__ + (16 * 1024)
+#if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) || defined(CONFIG_BAREMETAL_BOOT_SOURCE_NAND)
+	ldr r2, =CONFIG_BAREMETAL_ENTRY_ADDRESS + (16 * 1024)
+#elif defined (CONFIG_BAREMETAL_BOOT_SOURCE_RAM)
+	ldr r2, =__reloc_end__
 #endif
 
 1:

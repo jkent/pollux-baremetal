@@ -6,7 +6,6 @@ choice BAREMETAL_BOOT_SOURCE
 	prompt "Boot source"
 config BAREMETAL_BOOT_SOURCE_RAM
 	bool "RAM"
-	depends on NOT_IMPLEMENTED
 config BAREMETAL_BOOT_SOURCE_UART
 	bool "UART boot"
 config BAREMETAL_BOOT_SOURCE_NAND
