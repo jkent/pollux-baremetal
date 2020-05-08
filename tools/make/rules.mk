@@ -15,9 +15,6 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-ifndef RECURSIVE_INCLUDE
-RECURSIVE_INCLUDE := 1
-
 # default rule
 .PHONY: all
 all:
@@ -56,7 +53,7 @@ define collect_vars
   obj-y :=
   subdir-y :=
   relative := $(shell realpath --relative-to $(if $2,$2,$1) $1)
-  include $1/Makefile
+  include $1/vars.mk
   includes := $$(includes) $$(addprefix $1/,$$(include-y))
   objs := $$(objs) $$(addprefix $(BUILD)/$$(relative)/,$$(obj-y))
   $$(foreach dir,$$(subdir-y),\
@@ -153,8 +150,6 @@ $(BUILD)/$(basename $(target)).bin: $(BUILD)/$(basename $(target)).elf
 clean:
 	@rm -rf $(BUILD)
 
-.PHONY: boot
-boot: $(BUILD)/$(target)
-	${MICROMON_PATH}/bootstrap.py $< 115200
-
-endif
+.PHONY: run
+run: $(BUILD)/$(target)
+	${MICROMON_PATH}/bootstrap.py $<
