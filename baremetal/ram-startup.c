@@ -17,12 +17,10 @@
  */
 
 #include <asm/attributes.h>
-#include <asm/io.h>
-#include <mach/alive.h>
 
 void main(void);
 
-EARLY_CODE NAKED void startup(void)
+STARTUP_CODE NAKED void startup(void)
 {
 	main();
 }

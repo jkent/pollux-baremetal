@@ -18,6 +18,6 @@
 
 #pragma once
 
-#define EARLY_CODE __attribute__((section (".text.early")))
-#define EARLY_RODATA __attribute__((section (".rodata.early")))
+#define STARTUP_CODE __attribute__((section (".text.startup")))
+#define STARTUP_RODATA __attribute__((section (".rodata.startup")))
 #define NAKED __attribute__((naked))

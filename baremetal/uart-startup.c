@@ -31,7 +31,7 @@ static void startup_set_baudrate(void);
 static void startup_load_rest(void);
 void main(void);
 
-EARLY_CODE NAKED void startup(void)
+STARTUP_CODE NAKED void startup(void)
 {
 	lowlevel_uart_init(0);
 #if defined(CONFIG_BAREMETAL_LATCH_POWER)
@@ -47,7 +47,7 @@ EARLY_CODE NAKED void startup(void)
 }
 
 #if defined(CONFIG_BAREMETAL_LATCH_POWER)
-EARLY_CODE static void startup_latch_power(void)
+STARTUP_CODE static void startup_latch_power(void)
 {
 	writel(ALIVE_PWRGATEREG_NPOWERGATING, ALIVE_BASE + ALIVE_PWRGATEREG);
 	writel(0, ALIVE_BASE + ALIVE_GPIORSTREG);
@@ -57,7 +57,7 @@ EARLY_CODE static void startup_latch_power(void)
 }
 #endif
 
-EARLY_CODE static void startup_set_baudrate(void)
+STARTUP_CODE static void startup_set_baudrate(void)
 {
 	u32 baudinfo = lowlevel_read_u32();
 	lowlevel_write_u8(1);
@@ -73,7 +73,7 @@ EARLY_CODE static void startup_set_baudrate(void)
 	lowlevel_write_u8(1);
 }
 
-EARLY_CODE static void startup_load_rest(void)
+STARTUP_CODE static void startup_load_rest(void)
 {
 	void *start = (void *)(readw(0xA4000000) & 0x400 ? 16384 : 512);
 	u32 size = lowlevel_read_u32();

@@ -1,6 +1,10 @@
 mainmenu "POLLUX Baremetal Configuration"
 
-menu "Baremetal: startup"
+menu "Baremetal entry"
+
+config BAREMETAL_CUSTOM_ENTRY
+	bool "Custom entry code"
+	default n
 
 choice BAREMETAL_BOOT_SOURCE
 	prompt "Boot source"
@@ -28,27 +32,28 @@ config BAREMETAL_SHADOW
 	  1GB memory spaces are reversed.  Under most circumstances you want
 	  this enabled.
 
-config BAREMETAL_INITIAL_STACK_SIZE
-	hex "Initial stack size"
-	default 0x40000
-
-config BAREMETAL_ENTRY_ADDRESS
-	hex "Entry address" if BAREMETAL_BOOT_SOURCE_RAM
+config BAREMETAL_RUNTIME_ADDRESS
+	hex "Runtime address"
 	default 0x00000000 if BAREMETAL_SHADOW
 	default 0x80000000 if !BAREMETAL_SHADOW
 	range 0x00000000 0x07FFFFFF if BAREMETAL_SHADOW
 	range 0x80000000 0x87FFFFFF if !BAREMETAL_SHADOW
 
-config BAREMETAL_RELOCATE
-	bool "Relocate"
-	default y if BAREMETAL_BOOT_SOURCE_RAM
+config BAREMETAL_AUTO_RELOCATE
+	bool "Auto relocate"
+	default y
 
-config BAREMETAL_RELOCATE_ADDRESS
-	hex "Relocate address" if BAREMETAL_RELOCATE
-	default 0x00800000 if BAREMETAL_SHADOW
-	default 0x80800000 if !BAREMETAL_SHADOW
-	range 0x00000000 0x07FFFFFF if BAREMETAL_SHADOW
-	range 0x80000000 0x87FFFFFF if !BAREMETAL_SHADOW
+config BAREMETAL_INITIAL_STACK_SIZE
+	hex "Initial stack size"
+	default 0x40000
+
+endmenu
+
+menu "Baremetal startup"
+
+config BAREMETAL_CUSTOM_STARTUP
+	bool "Custom startup code"
+	default n
 
 config BAREMETAL_LATCH_POWER
 	bool "Latch power" if !BAREMETAL_BOOT_SOURCE_RAM
@@ -57,7 +62,7 @@ config BAREMETAL_LATCH_POWER
 	  Say Y here to enable latching power in startup code.
 endmenu
 
-menu "Baremetal: runtime"
+menu "Baremetal runtime"
 
 config BAREMETAL_ENABLE_ICACHE
 	bool "Enable ICache"
@@ -100,7 +105,6 @@ config BAREMETAL_DDR_INIT
 	bool "Initialize DDR"
 	default y
 	select BAREMETAL_CLOCKING
-
 
 config BAREMETAL_PLL0_INIT
 	bool

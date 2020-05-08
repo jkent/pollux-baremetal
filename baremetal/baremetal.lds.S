@@ -22,39 +22,54 @@ ENTRY(_entry)
 
 MEMORY
 {
-#if defined(CONFIG_BAREMETAL_RELOCATE)
-  ram : o = CONFIG_BAREMETAL_RELOCATE_ADDRESS, l = CONFIG_BAREMETAL_ENTRY_ADDRESS + 128M - CONFIG_BAREMETAL_RELOCATE_ADDRESS 
+#if defined(CONFIG_BAREMETAL_SHADOW)
+  ram : o = 0x00000000, l = 256M
+  rom : o = 0x80000000, l = 64M
 #else
-  ram : o = CONFIG_BAREMETAL_ENTRY_ADDRESS, l = 128M
+  rom : o = 0x00000000, l = 64M
+  ram : o = 0x80000000, l = 256M
 #endif
 }
 
 SECTIONS
 {
-  .text : AT(CONFIG_BAREMETAL_ENTRY_ADDRESS) {
-    __reloc_start__ = .;
-    */entry.*(.text.early .rodata.early)
-    *(.text.early .rodata.early)
+  .entry : {
+    *(.text.entry .rodata.entry)
+  } > ram 
+
+  .startup CONFIG_BAREMETAL_RUNTIME_ADDRESS + SIZEOF(.entry) :
+  AT(ADDR(.entry) + SIZEOF(.entry))
+  {
+    __reloc_start__ = . - SIZEOF(.entry);
+    *(.text.startup .rodata.startup)
 #if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) || defined(BAREMETAL_BOOT_SOURCE_NAND)
     . = ALIGN(512);
 #endif
+  } > ram
 
+  .text :
+  {
 		*(.text .stub .text.*)
 	} > ram
 
-	.rodata : {
+	.rodata :
+  {
     *(.rodata)
   } > ram
 
-	.got : {
+	.got :
+  {
     *(.got.plt) *(.igot.plt) *(.got) *(.igot)
   } > ram
 
-  .data : {
+  .data :
+  {
     *(.data .data.*)
   } > ram
+  __reloc_end__ = .;
 
-  .bss : {
+  .bss :
+  {
     __bss_start__ = .;
     *(.bss .bss.*)
     *(COMMON)
@@ -65,18 +80,18 @@ SECTIONS
     __bss_end__ = .;
   } > ram
 
-#if defined(CONFIG_BAREMETAL_RELOCATE)
-  __reloc_end__ = .;
-#endif
-
   __heap_start__ = .;
 #if defined(CONFIG_BAREMETAL_HEAP_FIXED)
-  . += CONFIG_BAREMETAL_HEAP_FIXED_SIZE;
+  .heap :
+  {
+    . += CONFIG_BAREMETAL_HEAP_FIXED_SIZE;
+  }
   __heap_end__ = .;
 #endif
 
   __initial_stack_end__ = .;
-  .stack : {
+  .stack :
+  {
     . += CONFIG_BAREMETAL_INITIAL_STACK_SIZE;
   } > ram
   __initial_stack_top__ = .;
