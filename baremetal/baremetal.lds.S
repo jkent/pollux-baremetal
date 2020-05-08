@@ -37,11 +37,11 @@ SECTIONS
     *(.text.entry .rodata.entry)
   } > ram 
 
-  .startup CONFIG_BAREMETAL_RUNTIME_ADDRESS + SIZEOF(.entry) :
+  .early CONFIG_BAREMETAL_RUNTIME_ADDRESS + SIZEOF(.entry) :
   AT(ADDR(.entry) + SIZEOF(.entry))
   {
     __reloc_start__ = . - SIZEOF(.entry);
-    *(.text.startup .rodata.startup)
+    *(.text.early .rodata.early)
 #if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) || defined(BAREMETAL_BOOT_SOURCE_NAND)
     . = ALIGN(512);
 #endif
@@ -49,7 +49,8 @@ SECTIONS
 
   .text :
   {
-		*(.text .stub .text.*)
+		*(.text.startup) /* place main first */
+		*(.text.* .text .stub)
 	} > ram
 
 	.rodata :
@@ -81,14 +82,6 @@ SECTIONS
   } > ram
 
   __heap_start__ = .;
-#if defined(CONFIG_BAREMETAL_HEAP_FIXED)
-  .heap :
-  {
-    . += CONFIG_BAREMETAL_HEAP_FIXED_SIZE;
-  }
-  __heap_end__ = .;
-#endif
-
   __initial_stack_end__ = .;
   .stack :
   {

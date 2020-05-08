@@ -37,7 +37,6 @@ LIBS     = -lgcc $(libs-y)
 INCLUDE  = -include $(BUILD)/config.h $(addprefix -I,$(BUILD) $(includes))
 
 cflags-y += -mlittle-endian -msoft-float -mtune=arm9tdmi -march=armv5te -mthumb -mthumb-interwork -nostartfiles
-ldscript-y ?= baremetal/baremetal.lds
 
 ifdef CONFIG_DEBUG
   cflags-y += -O0 -g3 -DDEBUG
@@ -46,17 +45,22 @@ else
 endif
 
 # traverse directories for variables
-includes := 
+includes :=
+ldflags :=
 objs :=
 dirs :=
 define collect_vars
   include-y :=
+  ldscript-y :=
   obj-y :=
   subdir-y :=
   relative := $(shell realpath --relative-to $(if $2,$2,$1) $1)
   include $1/vars.mk
   includes := $$(includes) $$(addprefix $1/,$$(include-y))
-  objs := $$(objs) $$(addprefix $(BUILD)/$$(relative)/,$$(obj-y))
+  ifneq ($$(strip $$(ldscript-y)),)
+    ldscript := $$(addprefix $$(relative)/,$$(ldscript-y))
+  endif
+  objs := $$(objs) $$(addprefix $$(BUILD)/$$(relative)/,$$(obj-y))
   $$(foreach dir,$$(subdir-y),\
     $$(eval dirs += $1/$$(dir))\
     $$(eval $$(call collect_vars,$(1)/$$(dir),$(if $2,$2,$1)))\
@@ -133,7 +137,7 @@ $(eval $(call generate_rules,$(BAREMETAL_RELATIVE_PATH)))
 $(BUILD)/config.h: $(BASEDIR)/.config | $$(@D)/.
 	$(Q)genconfig.py --header-path $@
 
-$(BUILD)/$(basename $(target)).elf: $(BUILD)/$(ldscript-y) $(objs) | $$(@D)/.
+$(BUILD)/$(basename $(target)).elf: $(BUILD)/$(ldscript) $(objs) | $$(@D)/.
 	$(Q) mkdir -p $(@D)
 	$(D) "   LD       $<"
 	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -T $^ $(LIBS) -o $@

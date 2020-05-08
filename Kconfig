@@ -1,11 +1,10 @@
 mainmenu "POLLUX Baremetal Configuration"
 
-menu "Baremetal entry"
+menuconfig BAREMETAL_USE_LINKER_SCRIPT
+	bool "Use baremetal linker script"
+	default y
 
-config BAREMETAL_CUSTOM_ENTRY
-	bool "Custom entry code"
-	default n
-
+if BAREMETAL_USE_LINKER_SCRIPT
 choice BAREMETAL_BOOT_SOURCE
 	prompt "Boot source"
 config BAREMETAL_BOOT_SOURCE_RAM
@@ -36,34 +35,47 @@ config BAREMETAL_RUNTIME_ADDRESS
 	hex "Runtime address"
 	default 0x00800000 if BAREMETAL_SHADOW
 	default 0x80800000 if !BAREMETAL_SHADOW
-	range 0x00800000 0x07FFFFFF if BAREMETAL_SHADOW
-	range 0x80800000 0x87FFFFFF if !BAREMETAL_SHADOW
-
-config BAREMETAL_AUTO_RELOCATE
-	bool "Auto relocate"
-	default y
+	range 0x00000000 0x07FFFFFF if BAREMETAL_SHADOW
+	range 0x80000000 0x87FFFFFF if !BAREMETAL_SHADOW
 
 config BAREMETAL_INITIAL_STACK_SIZE
 	hex "Initial stack size"
 	default 0x40000
+endif
 
-endmenu
+config BAREMETAL_USE_ENTRY_CODE
+menuconfig BAREMETAL_USE_ENTRY_CODE
+	depends on BAREMETAL_USE_LINKER_SCRIPT
+	bool "Use baremetal entry code"
+	default y
 
-menu "Baremetal startup"
+if BAREMETAL_USE_ENTRY_CODE
+config BAREMETAL_AUTO_RELOCATE
+	bool "Auto relocate"
+	default y
+endif
 
-config BAREMETAL_CUSTOM_STARTUP
-	bool "Custom startup code"
-	default n
+config BAREMETAL_USE_STARTUP_CODE
+menuconfig BAREMETAL_USE_STARTUP_CODE
+	depends on BAREMETAL_USE_ENTRY_CODE
+	bool "Use baremetal startup code"
+	default y
 
+if BAREMETAL_USE_STARTUP_CODE
 config BAREMETAL_LATCH_POWER
-	bool "Latch power" if !BAREMETAL_BOOT_SOURCE_RAM
+	bool "Latch power"
 	default y
 	help
 	  Say Y here to enable latching power in startup code.
-endmenu
+endif
 
-menu "Baremetal runtime"
+config BAREMETAL_USE_RUNTIME_CODE
+menuconfig BAREMETAL_USE_RUNTIME_CODE
+	depends on BAREMETAL_USE_ENTRY_CODE
+	bool "Use baremetal runtime code"
+	default y
 
+if BAREMETAL_USE_RUNTIME_CODE
 config BAREMETAL_ENABLE_ICACHE
 	bool "Enable ICache"
 	default y
@@ -101,37 +113,20 @@ endchoice
 config BAREMETAL_CLOCKING
 	bool
 
+config BAREMETAL_PLL0_INIT
+	bool
+
 config BAREMETAL_DDR_INIT
 	bool "Initialize DDR"
 	default y
 	select BAREMETAL_CLOCKING
 
-config BAREMETAL_PLL0_INIT
-	bool
-
-config BAREMETAL_USE_NEWLIB
-	bool "Use Newlib C Library"
-	default y
-
-choice BAREMETAL_HEAP
-	prompt "Heap type"
-	default BAREMETAL_HEAP_FIXED if !BAREMETAL_USE_NEWLIB 
-	default BAREMETAL_HEAP_AUTO if BAREMETAL_USE_NEWLIB
-config BAREMETAL_HEAP_NONE
-	bool "None"
-config BAREMETAL_HEAP_FIXED
-	bool "Fixed"
-config BAREMETAL_HEAP_AUTO
-	bool "Auto"
-endchoice
-
-config BAREMETAL_HEAP_FIXED_SIZE
-	depends on BAREMETAL_HEAP_FIXED
-	hex "Fixed heap size"
-	default 0x40000
-
 config BAREMETAL_MOVE_STACK
 	bool "Move stack to the top of RAM"
+
+config BAREMETAL_USE_NEWLIB_STUBS
+	bool "Setup Newlib stubs"
+	default y
 
 choice BAREMETAL_UART
 	prompt "UART implementation"
@@ -147,5 +142,4 @@ config BAREMETAL_UART_FIFO
 	depends on NOT_IMPLEMENTED
 	depends on BAREMETAL_INTERRUPTS
 endchoice
-
-endmenu
+endif

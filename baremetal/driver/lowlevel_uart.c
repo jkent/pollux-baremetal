@@ -28,7 +28,7 @@
  * default 147.461538 MHz and most of the UART registers are sane.  Tested
  * on the POLLUX VR3520F.
  */
-STARTUP_CODE void lowlevel_uart_init(u32 baudinfo)
+EARLY_CODE void lowlevel_uart_init(u32 baudinfo)
 {
 	if (baudinfo == 0) {
 		baudinfo = (11 << 16) | (1 << 1) | (39 << 4);
@@ -50,21 +50,21 @@ STARTUP_CODE void lowlevel_uart_init(u32 baudinfo)
 	writel(UART_UCON_TRANSMODE_INTPOLL | UART_UCON_RECVMODE_INTPOLL, UART0_BASE + UART_UCON);
 }
 
-STARTUP_CODE u8 lowlevel_read_u8(void)
+EARLY_CODE u8 lowlevel_read_u8(void)
 {
 	while (!(readw(UART0_BASE + UART_TRSTATUS) & UART_TRSTATUS_RXREADY))
 		;
 	return readb(UART0_BASE + UART_RHB);
 }
 
-STARTUP_CODE void lowlevel_write_u8(u8 c)
+EARLY_CODE void lowlevel_write_u8(u8 c)
 {
 	while (!(readw(UART0_BASE + UART_TRSTATUS) & UART_TRSTATUS_TXEMPTY))
 		;
 	writeb(c, UART0_BASE + UART_THB);
 }
 
-STARTUP_CODE u16 lowlevel_read_u16(void)
+EARLY_CODE u16 lowlevel_read_u16(void)
 {
 	u16 n;
 	n = lowlevel_read_u8();
@@ -72,13 +72,13 @@ STARTUP_CODE u16 lowlevel_read_u16(void)
 	return n;
 }
 
-STARTUP_CODE void lowlevel_write_u16(u16 n)
+EARLY_CODE void lowlevel_write_u16(u16 n)
 {
 	lowlevel_write_u8(n);
 	lowlevel_write_u8(n >> 8);
 }
 
-STARTUP_CODE u32 lowlevel_read_u32(void)
+EARLY_CODE u32 lowlevel_read_u32(void)
 {
 	u32 n;
 	n = lowlevel_read_u16();
@@ -86,7 +86,7 @@ STARTUP_CODE u32 lowlevel_read_u32(void)
 	return n;
 }
 
-STARTUP_CODE void lowlevel_write_u32(u32 n)
+EARLY_CODE void lowlevel_write_u32(u32 n)
 {
 	lowlevel_write_u16(n);
 	lowlevel_write_u16(n >> 16);

@@ -42,14 +42,12 @@ _entry:
 	stmia r1!, {r10-r11}
 	cmp	r1, r2
 	blo	1b
-
 2:
 	ldr r3, =3f
 	bx r3
 
 .ltorg
-
-.section .text.startup
+.section .text.early
 3:
 #endif
 

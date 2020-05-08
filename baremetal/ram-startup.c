@@ -20,7 +20,7 @@
 
 void main(void);
 
-STARTUP_CODE NAKED void startup(void)
+EARLY_CODE NAKED void startup(void)
 {
 	main();
 }
