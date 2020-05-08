@@ -1,6 +1,5 @@
-/* vim: set ts=4 sw=4 noexpandtab
- *
- * Copyright (C) 2011-2020 Jeff Kent <jakent@gmail.com>
+/*
+ * Copyright (C) 2011-2020 Jeff Kent <jeff@jkent.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
