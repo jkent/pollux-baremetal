@@ -34,6 +34,8 @@ _start:
 	ldr r2, =CONFIG_BAREMETAL_ENTRY_ADDRESS + (16 * 1024)
 #elif defined (CONFIG_BAREMETAL_BOOT_SOURCE_RAM)
 	ldr r2, =__reloc_end__
+	sub r2, r2, r1
+	add r2, r2, r0
 #endif
 
 1:

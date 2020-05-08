@@ -51,7 +51,7 @@ config BAREMETAL_RELOCATE_ADDRESS
 	range 0x80000000 0x87FFFFFF if !BAREMETAL_SHADOW
 
 config BAREMETAL_LATCH_POWER
-	bool "Latch power"
+	bool "Latch power" if !BAREMETAL_BOOT_SOURCE_RAM
 	default y
 	help
 	  Say Y here to enable latching power in startup code.

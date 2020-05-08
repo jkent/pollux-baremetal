@@ -3,6 +3,10 @@ $(error Not in a baremetal enabled shell)
 endif
 include $(BAREMETAL_PATH)/tools/make/rules.mk
 
-target := empty.bin
+target := hello-world.bin
 
 obj-y += main.o
+
+.PHONY: run
+run: $(BUILD)/$(target)
+	bootstrap.py $<

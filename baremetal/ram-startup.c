@@ -20,24 +20,9 @@
 #include <asm/io.h>
 #include <mach/alive.h>
 
-#if defined (CONFIG_BAREMETAL_LATCH_POWER)
-static void startup_latch_power(void);
-#endif
 void main(void);
 
 EARLY_CODE NAKED void startup(void)
 {
-	startup_latch_power();
 	main();
 }
-
-#if defined(CONFIG_BAREMETAL_LATCH_POWER)
-EARLY_CODE static void startup_latch_power(void)
-{
-	writel(ALIVE_PWRGATEREG_NPOWERGATING, ALIVE_BASE + ALIVE_PWRGATEREG);
-	writel(0, ALIVE_BASE + ALIVE_GPIORSTREG);
-	writel(ALIVE_GPIO_VDDPWRONRST, ALIVE_BASE + ALIVE_GPIOSETREG);
-	writel(0, ALIVE_BASE + ALIVE_GPIOSETREG);
-	writel(0, ALIVE_BASE + ALIVE_PWRGATEREG);
-}
-#endif

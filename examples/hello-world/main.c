@@ -16,8 +16,33 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <asm/types.h>
+#include <driver/lowlevel_uart.h>
+#include <stdio.h> 
+
+int putchar(int c)
+{
+    if (c == '\n') {
+        lowlevel_write_u8((u8)'\r');
+    }
+    lowlevel_write_u8((u8)c);
+    return c;
+}
+
+int puts(const char *s)
+{
+    while (*s) {
+        if (!putchar(*s++)) {
+            return EOF;
+        }
+    }
+    return putchar('\n');
+}
+
 int main(void)
 {
+    puts("Hello world!");
+
     while(1)
         ;
     return 0;
