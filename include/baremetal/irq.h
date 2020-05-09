@@ -15,8 +15,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __IRQ_H
-#define __IRQ_H
+#pragma once
 
 typedef void (*irq_handler_t) (void);
 
@@ -25,6 +24,3 @@ irq_handler_t irq_handlers[64];
 extern void irq_handler(unsigned long long pending);
 extern void enable_interrupts(void);
 extern void disable_interrupts(void);
-
-#endif /* __IRQ_H */
-

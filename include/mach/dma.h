@@ -15,8 +15,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _MACH_DMA_H
-#define _MACH_DMA_H
+#pragma once
 
 #define DMA0_BASE (0xC0000000)
 #define DMA1_BASE (0xC0000080)
@@ -77,6 +76,3 @@
 #define DMA_REQ_AUDIO_IN			(26)
 #define DMA_REQ_SDI1				(30)
 #define DMA_REQ_MCUS				(31)
-
-#endif /* _MACH_DMA_H */
-

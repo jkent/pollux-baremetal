@@ -15,8 +15,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _MACH_NAND_H
-#define _MACH_NAND_H
+#pragma once
 
 #define NAND_BASE (0xAC000000)
 
@@ -54,6 +53,3 @@
 #define NAND_STATUS_TRUE_READY		(0x20)
 #define NAND_STATUS_READY		(0x40)
 #define NAND_STATUS_WP			(0x80)
-
-#endif /* _MACH_NAND_H */
-

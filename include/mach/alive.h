@@ -15,9 +15,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
-#ifndef _MACH_ALIVE_H
-#define _MACH_ALIVE_H
+#pragma once
 
 #define ALIVE_BASE (0xC0019000)
 
@@ -34,5 +32,3 @@
 #define ALIVE_GPIOSCRATCHRST		ALIVE_REG(0x10)
 #define ALIVE_GPIOSCRATCHSET		ALIVE_REG(0x14)
 #define ALIVE_GPIOSCRATCREAD		ALIVE_REG(0x18)
-
-#endif /* _MACH_ALIVE_H */

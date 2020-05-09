@@ -15,8 +15,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _MACH_CLKPWR_H
-#define _MACH_CLKPWR_H
+#pragma once
 
 #define CLKPWR_BASE (0xC000F000)
 
@@ -68,6 +67,3 @@
 
 #define CLKPWR_PLL(pdiv, mdiv, sdiv) \
 	((pdiv << 18) | (mdiv << 8) | (sdiv << 0))
-
-#endif /* _MACH_CLKPWR_H */
-

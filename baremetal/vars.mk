@@ -12,7 +12,7 @@ endif
 # Support code
 subdir-y += driver
 obj-y += cache.arm.o
+obj-y += clocking.o
 obj-y += crc32.o
 obj-y += mmu.o mmu.arm.o
-obj-y += ram.o
 obj-y += util.o

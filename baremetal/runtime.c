@@ -19,6 +19,7 @@
 #include <baremetal/cache.h>
 #include <baremetal/mmu.h>
 #include <baremetal/util.h>
+#include <baremetal/clocking.h>
 
 void runtime(void)
 {
@@ -33,6 +34,13 @@ void runtime(void)
 #if defined(CONFIG_BAREMETAL_ENABLE_DCACHE)
     dcache_enable();
 #endif
+#if defined(CONFIG_BAREMETAL_PLL0_INIT_533)
+    pll0_init();
+#endif
+#if defined(CONFIG_BAREMETAL_DDR_INIT)
+    ddr_init();
+#endif
+
     main();
     halt();
 }

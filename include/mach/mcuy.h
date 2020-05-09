@@ -15,8 +15,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _MACH_MCUY_H
-#define _MACH_MCUY_H
+#pragma once
 
 #define MCUY_BASE (0xC0014800)
 
@@ -30,6 +29,3 @@
 #define MCUY_CLKDELAY				MCUY_REG(0x0C)
 #define MCUY_DQSOUTDELAY			MCUY_REG(0x0E)
 #define MCUY_DQSINDELAY				MCUY_REG(0x10)
-
-#endif /* _MACH_MCUY_H */
-

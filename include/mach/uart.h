@@ -15,8 +15,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _MACH_UART_H
-#define _MACH_UART_H
+#pragma once
 
 #define UART0_BASE (0xC0016000)
 #define UART1_BASE (0xC0016080)
@@ -56,6 +55,3 @@
 #define UART_CLKGEN_CLKDIV_MASK			(0x3F << 4)
 #define UART_CLKGEN_CLKDIV(_x)			(_x << 4)
 #define UART_CLKGEN_CLKSRCSEL(_x)		(_x << 1)
-
-#endif /* _MACH_UART_H */
-

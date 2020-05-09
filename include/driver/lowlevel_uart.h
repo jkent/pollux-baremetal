@@ -16,8 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
  
-#ifndef __UART_H__
-#define __UART_H__
+#pragma once
 
 #include <asm/types.h>
 
@@ -28,5 +27,3 @@ u16 lowlevel_read_u16(void);
 void lowlevel_write_u16(u16 n);
 u32 lowlevel_read_u32(void);
 void lowlevel_write_u32(u32 n);
-
-#endif /* __UART_H__ */

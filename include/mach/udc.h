@@ -15,8 +15,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _MACH_UDC_H
-#define _MACH_UDC_H
+#pragma once
 
 #define UDC_BASE (0xC0018000)
 
@@ -109,6 +108,3 @@
 #define UDC_CLKGEN			UDC_REG(0x8c4)
 #define UDC_CLKGEN_CLKDIV(_x)		(_x << 4)
 #define UDC_CLKGEN_CLKSRC_EXT		(3 << 1)
-
-#endif /* _MACH_UDC_H */
-

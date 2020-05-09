@@ -16,8 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __CRC32_H__
-#define __CRC32_H__
+#pragma once
 
 #include <asm/types.h>
 
@@ -25,5 +24,3 @@
 
 void init_crc32_table(void);
 u32 crc32(u32 crc, const u8 data);
-
-#endif /* __CRC32_H__ */

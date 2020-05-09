@@ -15,8 +15,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _MACH_IRQ_H
-#define _MACH_IRQ_H
+#pragma once
 
 #define IRQ_BASE (0xC0000800)
 
@@ -72,6 +71,3 @@
 #define IRQ_ARBSEL2(_x)			(((_x) & 3) << 4)
 #define IRQ_ARBSEL1(_x)			(((_x) & 3) << 2)
 #define IRQ_ARBSEL0(_x)			(((_x) & 3) << 0)
-
-#endif /* _MACH_IRQ_H */
-

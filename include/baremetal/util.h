@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "asm/types.h"
-#include "linux/stddef.h"
+#include <asm/types.h>
+#include <stddef.h>
 
 /* from include/linux/kernel.h */
 
@@ -61,6 +61,7 @@
 
 void main(void);
 void __attribute__((noreturn)) halt(void);
+u32 ram_detect(void);
 
 static inline void __attribute__((always_inline)) enable_interrupts(void)
 {

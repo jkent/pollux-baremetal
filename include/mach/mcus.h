@@ -15,8 +15,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _MACH_MCUS_H
-#define _MACH_MCUS_H
+#pragma once
 
 #define MCUS_BASE (0xC0015800)
 
@@ -54,6 +53,3 @@
 #define MCUS_NFECCSTATUS		MCUS_REG(0x8c)
 #define MCUS_NFSYNDROME31		MCUS_REG(0x90)
 #define MCUS_NFSYNDROME75		MCUS_REG(0x94)
-
-#endif /* _MACH_MCUS_H */
-

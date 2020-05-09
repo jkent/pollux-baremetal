@@ -15,8 +15,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _MACH_GPIO_H
-#define _MACH_GPIO_H
+#pragma once
 
 #define GPIOA_BASE (0xC000A000)
 #define GPIOB_BASE (0xC000A040)
@@ -37,6 +36,3 @@
 #define GPIO_ALTFN_GPIO				(0)
 #define GPIO_ALTFN_ALTFN1			(1)
 #define GPIO_ALTFN_ALTFN2			(2)
-
-#endif /* _MACH_GPIO_H */
-
