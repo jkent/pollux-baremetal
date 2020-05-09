@@ -67,6 +67,7 @@ SECTIONS
   {
     *(.data .data.*)
   } > ram
+  . = ALIGN(8);
   __reloc_end__ = .;
 
   .bss :

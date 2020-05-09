@@ -22,7 +22,8 @@
 
 void icache_invalidate(void)
 {
-	asm("mcr p15, 0, r0, c7, c5, 0");
+	u32 sbz = 0;
+	asm("mcr p15, 0, %0, c7, c5, 0" : "=r" (sbz));
 }
 
 void icache_enable(void)

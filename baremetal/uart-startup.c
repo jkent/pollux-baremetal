@@ -81,12 +81,9 @@ EARLY_CODE static void startup_set_baudrate(void)
 
 EARLY_CODE static void startup_load_rest(void)
 {
-	void *start = (void *)(readw(0xA4000000) & 0x400 ? 16384 : 512);
+	void *start = CONFIG_BAREMETAL_RUNTIME_ADDRESS;
+	start += (readw(0xA4000000) & 0x400) ? 16 * 1024 : 512;
 	u32 size = lowlevel_read_u32();
-
-#if defined(CONFIG_BAREMETAL_RELOCATE)
-	start += CONFIG_BAREMETAL_RELOCATE_ADDRESS;
-#endif
 
 	for (void *p = start; p < start + size; p += 4) {
 		*(u32 *)p = lowlevel_read_u32();
