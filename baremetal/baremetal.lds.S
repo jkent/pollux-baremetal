@@ -90,3 +90,8 @@ SECTIONS
   } > ram
   __initial_stack_top__ = .;
 }
+
+#if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) || defined(BAREMETAL_BOOT_SOURCE_NAND)
+ASSERT(SIZEOF(.entry) + SIZEOF(.early) <= 512,
+        "Early boot does not fit within 512 bytes")
+#endif
