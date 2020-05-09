@@ -49,11 +49,11 @@ SECTIONS
 
   .text :
   {
-		*(.text.startup) /* place main first */
-		*(.text.* .text .stub)
-	} > ram
+    *(.text.startup) /* place main first */
+    *(.text.* .text .stub)
+  } > ram
 
-	.rodata :
+  .rodata :
   {
     *(.rodata)
   } > ram

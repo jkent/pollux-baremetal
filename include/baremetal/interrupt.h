@@ -17,10 +17,12 @@
 
 #pragma once
 
-typedef void (*irq_handler_t) (void);
+#include <asm/types.h>
 
-irq_handler_t irq_handlers[64];
+typedef void (*interrupt_handler_t)(void);
 
-extern void irq_handler(unsigned long long pending);
+interrupt_handler_t interrupt_handlers[64];
+
+extern void interrupt_handler(u64 pending);
 extern void enable_interrupts(void);
 extern void disable_interrupts(void);

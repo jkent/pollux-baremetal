@@ -14,5 +14,6 @@ subdir-y += driver
 obj-y += cache.arm.o
 obj-y += clocking.o
 obj-y += crc32.o
+obj-y += interrupt.arm.o
 obj-y += mmu.o mmu.arm.o
 obj-y += util.o

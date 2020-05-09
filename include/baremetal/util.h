@@ -62,21 +62,3 @@
 void main(void);
 void __attribute__((noreturn)) halt(void);
 u32 ram_detect(void);
-
-static inline void __attribute__((always_inline)) enable_interrupts(void)
-{
-	u32 n;
-
-	asm("mrs r0, cpsr_c\n\t":"=r"(n));
-	n &= ~(0x80);
-	asm("msr r0, cpsr_c\n\t"::"r"(n));
-}
-
-static inline void __attribute__((always_inline)) disable_interrupts(void)
-{
-	u32 n;
-
-	asm("mrs r0, cpsr_c\n\t":"=r"(n));
-	n |= 0x80;
-	asm("msr r0, cpsr_c\n\t"::"r"(n));
-}
