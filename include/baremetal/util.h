@@ -59,6 +59,7 @@
 	const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
 	(type *)( (char *)__mptr - offsetof(type,member) );})
 
+void startup(void);
 void main(void);
 void __attribute__((noreturn)) halt(void);
-u32 ram_detect(void);
+u32 get_ram_size(void);

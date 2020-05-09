@@ -17,15 +17,15 @@
  */
 
 #include <asm/types.h>
-#include <driver/lowlevel_uart.h>
+#include <driver/early-uart.h>
 #include <stdio.h> 
 
 int putchar(int c)
 {
     if (c == '\n') {
-        lowlevel_write_u8((u8)'\r');
+        early_write_u8((u8)'\r');
     }
-    lowlevel_write_u8((u8)c);
+    early_write_u8((u8)c);
     return c;
 }
 

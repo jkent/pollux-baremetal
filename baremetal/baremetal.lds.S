@@ -49,6 +49,7 @@ SECTIONS
 
   .text :
   {
+    *(.text._startup)
     *(.text.startup) /* place main first */
     *(.text.* .text .stub)
   } > ram

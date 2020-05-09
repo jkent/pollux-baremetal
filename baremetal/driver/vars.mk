@@ -1,1 +1,1 @@
-obj-y += lowlevel_uart.o
+obj-y += early_uart.o

@@ -16,8 +16,41 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#pragma once
+#include <baremetal/cache.h>
+#include <baremetal/mmu.h>
+#include <baremetal/util.h>
+#include <baremetal/clocking.h>
 
-#define EARLY_CODE __attribute__((section (".text.early")))
-#define EARLY_RODATA __attribute__((section (".rodata.early")))
-#define NAKED __attribute__((naked))
+void startup(void)
+{
+#if defined(CONFIG_BAREMETAL_ENABLE_ICACHE)
+    icache_enable();
+#endif
+
+#if defined(CONIFG_BAREMETAL_ENABLE_MMU)
+    init_tlb(main_tlb);
+    assign_tlb(main_tlb);
+    mmu_enable()
+#endif
+
+#if defined(CONFIG_BAREMETAL_ENABLE_DCACHE)
+    dcache_enable();
+#endif
+
+#if defined(CONFIG_BAREMETAL_PLL0_INIT_533)
+    pll0_init();
+#endif
+
+#if defined(CONFIG_BAREMETAL_DDR_INIT)
+    ddr_init();
+#endif
+
+    u32 ram_top = get_ram_size(); 
+#if !defined(CONFIG_BAREMETAL_SHADOW)
+    ram_top += 0x80000000l;
+#endif
+    asm("ldr sp, %0" : "=r" (ram_top));
+
+    main();
+    halt();
+}

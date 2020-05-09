@@ -16,8 +16,7 @@
  */
 
 #include <asm/types.h>
-
-#define CR_M  (1 <<  0) /* MMU enable */
+#include <baremetal/linker.h>
 
 void mmu_init_tlb(u32 *tlb)
 {

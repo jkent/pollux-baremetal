@@ -27,21 +27,30 @@ void halt(void)
         ;
 }
 
-u32 ram_detect(void)
+u32 get_ram_size(void)
 {
 	u32 memcfg = readl(MCUY_BASE + MCUY_CFG);
 	u32 ramsize = 8 << (memcfg & 0x3);
 
-	volatile u32 *low = (u32 *)((ramsize << 20) - 4);
-	volatile u32 *high = (u32 *)(((ramsize + 64) << 20) - 4);
+	volatile u32 *low = (void *)((ramsize << 20) - 4);
+	volatile u32 *high = (void *)(((ramsize + 64) << 20) - 4);
 
-	*low = 0x55AA55AA;
-	*high = 0xAA55AA55;
+#if !defined(CONFIG_BAREMETAL_SHADOW)
+	(void *)low += 0x80000000;
+	(void *)high += 0x80000000;
+#endif
 
-	if (*low != 0xAA55AA55)
+	u32 old_low = *low;
+	u32 old_high = *high;
+	
+	*(u32 *)low = 0x55AA55AA;
+	*(u32 *)high = 0xAA55AA55;
+
+	if (*(u32 *)low != 0xAA55AA55)
 		ramsize <<= 1;
 
-	ramsize = ramsize * 1024 * 1024;
+	*low = old_low;
+	*high = old_high;
 
-    return ramsize;
+    return ramsize << 20;
 }

@@ -33,35 +33,35 @@ config BAREMETAL_SHADOW
 
 config BAREMETAL_RUNTIME_ADDRESS
 	hex "Runtime address"
-	default 0x00800000 if BAREMETAL_SHADOW
-	default 0x80800000 if !BAREMETAL_SHADOW
+	default 0x00000000 if BAREMETAL_SHADOW
+	default 0x80000000 if !BAREMETAL_SHADOW
 	range 0x00000000 0x07FFFFFF if BAREMETAL_SHADOW
 	range 0x80000000 0x87FFFFFF if !BAREMETAL_SHADOW
 
 config BAREMETAL_INITIAL_STACK_SIZE
 	hex "Initial stack size"
-	default 0x40000
+	default 0x4000
 endif
 
-config BAREMETAL_USE_ENTRY_CODE
-menuconfig BAREMETAL_USE_ENTRY_CODE
+config BAREMETAL_USE_ENTRY
+menuconfig BAREMETAL_USE_ENTRY
 	depends on BAREMETAL_USE_LINKER_SCRIPT
 	bool "Use baremetal entry code"
 	default y
 
-if BAREMETAL_USE_ENTRY_CODE
+if BAREMETAL_USE_ENTRY
 config BAREMETAL_AUTO_RELOCATE
 	bool "Auto relocate"
 	default y
 endif
 
-config BAREMETAL_USE_STARTUP_CODE
-menuconfig BAREMETAL_USE_STARTUP_CODE
-	depends on BAREMETAL_USE_ENTRY_CODE
-	bool "Use baremetal startup code"
+config BAREMETAL_USE_EARLY
+menuconfig BAREMETAL_USE_EARLY
+	depends on BAREMETAL_USE_ENTRY
+	bool "Use baremetal early code"
 	default y
 
-if BAREMETAL_USE_STARTUP_CODE
+if BAREMETAL_USE_EARLY
 config BAREMETAL_LATCH_POWER
 	bool "Latch power"
 	default y
@@ -69,13 +69,13 @@ config BAREMETAL_LATCH_POWER
 	  Say Y here to enable latching power in startup code.
 endif
 
-config BAREMETAL_USE_RUNTIME_CODE
-menuconfig BAREMETAL_USE_RUNTIME_CODE
-	depends on BAREMETAL_USE_STARTUP_CODE
-	bool "Use baremetal runtime code"
+config BAREMETAL_USE_STARTUP
+menuconfig BAREMETAL_USE_STARTUP
+	depends on BAREMETAL_USE_EARLY
+	bool "Use baremetal startup code"
 	default y
 
-if BAREMETAL_USE_RUNTIME_CODE
+if BAREMETAL_USE_STARTUP
 config BAREMETAL_ENABLE_ICACHE
 	bool "Enable ICache"
 	default y
@@ -113,13 +113,6 @@ config BAREMETAL_DDR_INIT
 	bool "Initialize DDR"
 	default y
 	select BAREMETAL_CLOCKING
-
-config BAREMETAL_MOVE_STACK
-	bool "Move stack to the top of RAM"
-
-config BAREMETAL_USE_NEWLIB_STUBS
-	bool "Setup Newlib stubs"
-	default y
 
 choice BAREMETAL_UART
 	prompt "UART implementation"

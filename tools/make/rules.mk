@@ -30,7 +30,7 @@ OBJDUMP := arm-none-eabi-objdump
 SIZE    := arm-none-eabi-size
 
 ASFLAGS :=
-CFLAGS   = -std=gnu99 -Wall -fms-extensions $(cflags-y)
+CFLAGS   = -std=gnu99 -Wall -Wno-unused-function -fms-extensions $(cflags-y)
 CXXFLAGS :=
 LDFLAGS := -Wl,--gc-sections -Wl,-M,-Map,$(BUILD)/$(basename $(target)).map
 LIBS     = -lgcc $(libs-y)
@@ -116,35 +116,65 @@ $$(BUILD)/%.o: $(1)/%.S | $$(DEPS)
 	$$(D) "   AS       $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $(INSTRUCTION_SET) $$(ASFLAGS) $$(INCLUDE) $$< -o $$@
 
+# .arm.c -> .arm.o
 $$(BUILD)/%.arm.o: $(1)/%.arm.c | $$(DEPS)
 	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CC       $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -marm $$(INCLUDE) $$< -o $$@
 
-$$(BUILD)/%.o: $(1)/%.c | $$(DEPS)
+# .thumb.c -> .thumb.o
+$$(BUILD)/%.thumb.o: $(1)/%.thumb.c | $$(DEPS)
 	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CC       $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -mthumb $$(INCLUDE) $$< -o $$@
 
+# .c -> .o
 $$(BUILD)/%.o: $(1)/%.c | $$(DEPS)
 	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CC       $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $(INSTRUCTION_SET) $$(INCLUDE) $$< -o $$@
 
+# .arm.c -> .o
+$$(BUILD)/%.o: $(1)/%.arm.c | $$(DEPS)
+	$$(Q) mkdir -p $$(@D)
+	$$(D) "   CC       $$<"
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -marm $$(INCLUDE) $$< -o $$@
+
+# .thumb.c -> .o
+$$(BUILD)/%.o: $(1)/%.thumb.c | $$(DEPS)
+	$$(Q) mkdir -p $$(@D)
+	$$(D) "   CC       $$<"
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -mthumb $$(INCLUDE) $$< -o $$@
+
+# .arm.cpp -> .arm.o
 $$(BUILD)/%.arm.o: $(1)/%.arm.cpp | $$(DEPS)
 	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CXX      $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -marm $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
 
+# .thumb.cpp -> .arm.o
 $$(BUILD)/%.thumb.o: $(1)/%.thumb.cpp | $$(DEPS)
 	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CXX      $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -thumb $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
 
+# .o -> .o
 $$(BUILD)/%.o: $(1)/%.cpp | $$(DEPS)
 	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CXX      $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $(INSTRUCTION_SET) $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
+
+# .arm.cpp -> .o
+$$(BUILD)/%.o: $(1)/%.arm.cpp | $$(DEPS)
+	$$(Q) mkdir -p $$(@D)
+	$$(D) "   CXX      $$<"
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -marm $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
+
+# .thumb.cpp -> .o
+$$(BUILD)/%.o: $(1)/%.thumb.cpp | $$(DEPS)
+	$$(Q) mkdir -p $$(@D)
+	$$(D) "   CXX      $$<"
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -thumb $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
 endef
 
 $(eval $(call generate_rules,$(BASEDIR)))

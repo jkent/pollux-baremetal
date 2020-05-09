@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Jeff Kent <jeff@jkent.net>
+ * Copyright (C) 2011-2020 Jeff Kent <jeff@jkent.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,32 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+ 
+#pragma once
 
-#include <baremetal/cache.h>
-#include <baremetal/mmu.h>
-#include <baremetal/util.h>
-#include <baremetal/clocking.h>
+#include <asm/types.h>
 
-void runtime(void)
-{
-#if defined(CONFIG_BAREMETAL_ENABLE_ICACHE)
-    icache_enable();
-#endif
-#if defined(CONIFG_BAREMETAL_ENABLE_MMU)
-    init_tlb(main_tlb);
-    assign_tlb(main_tlb);
-    mmu_enable()
-#endif
-#if defined(CONFIG_BAREMETAL_ENABLE_DCACHE)
-    dcache_enable();
-#endif
-#if defined(CONFIG_BAREMETAL_PLL0_INIT_533)
-    pll0_init();
-#endif
-#if defined(CONFIG_BAREMETAL_DDR_INIT)
-    ddr_init();
-#endif
-
-    main();
-    halt();
-}
+void early_uart_init(u32 baudinfo);
+u8 early_read_u8(void);
+void early_write_u8(u8 c);
+u16 early_read_u16(void);
+void early_write_u16(u16 n);
+u32 early_read_u32(void);
+void early_write_u32(u32 n);

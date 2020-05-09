@@ -40,24 +40,24 @@ _entry:
 1:
 	ldmia r0!, {r10-r11}
 	stmia r1!, {r10-r11}
-	cmp	r1, r2
-	blo	1b
+	cmp r1, r2
+	blo 1b
 2:
-	ldr r3, =3f
-	bx r3
-
-.ltorg
-.section .text.early
-3:
 #endif
 
+	/* clear .bss */
+	ldr r0, =__bss_start__
+	ldr r1, =__bss_end__
+	mov r2, #0
+1:	cmp r0, r1
+	strlo r2, [r0], #4
+	blo 1b
+
 	/* setup temporary stack */
-	ldr	sp, =__initial_stack_top__
+	ldr sp, =__initial_stack_top__
 
-	/* jump to loader in thumb mode */
-	ldr r3, =startup
+	ldr r3, =early_startup
 	bx r3
-
 .ltorg
 
 .end

@@ -20,5 +20,11 @@
 
 #include <asm/types.h>
 
-extern u32 *__reloc_start__;
-extern u32 *__reloc_end__;
+#define EARLY_CODE __attribute__((section (".text.early")))
+#define EARLY_RODATA __attribute__((section (".rodata.early")))
+#define STARTUP_CODE __attribute__((seciton (".text._startup")))
+#define STARTUP_RODATA __attribute__((seciton (".rodata._startup")))
+#define NAKED __attribute__((naked))
+
+extern u32 __reloc_start__;
+extern u32 __reloc_end__;

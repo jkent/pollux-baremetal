@@ -27,16 +27,6 @@ static const uint8_t magic_lut[64] = {
 	51, 25, 36, 32, 60, 20, 57, 16, 50, 31, 19, 15, 30, 14, 13, 12
 };
 
-typedef struct {
-	u32 reset;
-	u32 undef;
-	u32 swi;
-	u32 pabort;
-	u32 dabort;
-	u32 reserved;
-	u32 irq;
-	u32 fiq;
-} vector_table_t;
 
 __attribute__((interrupt, weak))
 void reset_handler(void)
@@ -80,20 +70,24 @@ void fiq_handler(void)
 
 void setup_vector_table(void)
 {
-	u32 *branches = (u32 *)0x00000000;
+#if CONFIG_USE_HIGH_INTERRUPTS	
+	u32 *vectors = (u32 *)0xFFFF0000;
+#else
+	u32 *vectors = (u32 *)0x00000000;
+#endif
+
 	for (int i = 0; i < 8; i++) {
-		branches[i] = 0xE59FF018; /* ldr pc, [pc, #24] */
+		vectors[i] = 0xE59FF018; /* ldr pc, [pc, #24] */
 	}
 
-	u32 *vectors = (void *)0x00000020;
-	vectors[0] = (u32)reset_handler;
-	vectors[1] = (u32)undef_handler;
-	vectors[2] = (u32)swi_handler;
-	vectors[3] = (u32)pabort_handler;
-	vectors[4] = (u32)dabort_handler;
-	vectors[5] = (u32)reserved_handler;
-	vectors[6] = (u32)irq_handler;
-	vectors[7] = (u32)fiq_handler;
+	vectors[8] = (u32)reset_handler;
+	vectors[9] = (u32)undef_handler;
+	vectors[10] = (u32)swi_handler;
+	vectors[11] = (u32)pabort_handler;
+	vectors[12] = (u32)dabort_handler;
+	vectors[13] = (u32)reserved_handler;
+	vectors[14] = (u32)irq_handler;
+	vectors[15] = (u32)fiq_handler;
 }
 
 /* pending is guaranteed to have only one bit set at a time */
