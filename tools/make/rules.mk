@@ -32,7 +32,7 @@ SIZE    := arm-none-eabi-size
 ASFLAGS :=
 CFLAGS   = -std=gnu99 -Wall -Wno-unused-function -fms-extensions $(cflags-y)
 CXXFLAGS :=
-LDFLAGS := -Wl,--gc-sections -Wl,-M,-Map,$(BUILD)/$(basename $(target)).map
+LDFLAGS = -Wl,--gc-sections -Wl,-Map=$(BUILD)/$(basename $(target)).map
 LIBS     = -lgcc $(libs-y)
 INCLUDE  = -include $(BUILD)/config.h $(addprefix -I,$(BUILD) $(includes))
 INSTRUCTION_SET := -mthumb

@@ -17,7 +17,7 @@
  */
 
 #include <asm/types.h>
-#include <driver/early-uart.h>
+#include <driver/early_uart.h>
 #include <stdio.h> 
 
 int putchar(int c)

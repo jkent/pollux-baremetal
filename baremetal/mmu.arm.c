@@ -19,13 +19,19 @@
 
 #define CR_M (1 << 0) /* enable MMU */
 
-void mmu_assign_tlb(u32 *tlb)
+#include <asm/types.h>
+#include <baremetal/interrupt.h>
+#include <baremetal/linker.h>
+#include <baremetal/mmu.h>
+
+void mmu_load(void)
 {
 	/* set domain 0 for unchecked access (manager) */
     asm("mov r1, #3\n\t"
         "mcr p15, 0, r1, c3, c0, 0" ::: "r1");
 
-    asm("mcr p15, 0, %0, c2, c0, 0" : "=r" (tlb));
+	/* load tlb */
+	asm("mcr p15, 0, %0, c2, c0, 0" :: "r" (main_tlb) : "memory");
 }
 
 void mmu_enable(void)

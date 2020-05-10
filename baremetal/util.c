@@ -42,11 +42,11 @@ u32 get_ram_size(void)
 
 	u32 old_low = *low;
 	u32 old_high = *high;
-	
-	*(u32 *)low = 0x55AA55AA;
-	*(u32 *)high = 0xAA55AA55;
 
-	if (*(u32 *)low != 0xAA55AA55)
+	*low = 0x55AA55AA;
+	*high = 0xAA55AA55;
+
+	if (*low != 0xAA55AA55)
 		ramsize <<= 1;
 
 	*low = old_low;

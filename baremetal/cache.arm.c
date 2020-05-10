@@ -23,7 +23,7 @@
 void icache_invalidate(void)
 {
 	u32 sbz = 0;
-	asm("mcr p15, 0, %0, c7, c5, 0" : "=r" (sbz));
+	asm("mcr p15, 0, %0, c7, c5, 0" :: "r" (sbz));
 }
 
 void icache_enable(void)
@@ -61,7 +61,7 @@ void dcache_enable(void)
 	asm("mcr p15, 0, %0, c1, c0, 0" :: "r" (cr));
 }
 
-void dcache_diable(void)
+void dcache_disable(void)
 {
 	dcache_invalidate();
 

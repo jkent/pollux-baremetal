@@ -27,7 +27,6 @@ static const uint8_t magic_lut[64] = {
 	51, 25, 36, 32, 60, 20, 57, 16, 50, 31, 19, 15, 30, 14, 13, 12
 };
 
-
 __attribute__((interrupt, weak))
 void reset_handler(void)
 {
@@ -70,7 +69,7 @@ void fiq_handler(void)
 
 void setup_vector_table(void)
 {
-#if CONFIG_USE_HIGH_INTERRUPTS	
+#if CONFIG_USE_HIGH_INTERRUPTS
 	u32 *vectors = (u32 *)0xFFFF0000;
 #else
 	u32 *vectors = (u32 *)0x00000000;
@@ -93,12 +92,9 @@ void setup_vector_table(void)
 /* pending is guaranteed to have only one bit set at a time */
 void interrupt_handler(u64 pending)
 {
-	interrupt_handler_t handler;
-	uint8_t interrupt;
-
-	pending &= 0x00000FFFFFFFFFFFull;
-	interrupt = magic_lut[(uint64_t)(pending * 0x022fdd63cc95386dull) >> 58];
-	handler = interrupt_handlers[interrupt];
+	pending &= 0x00000FFFFFFFFFFFULL;
+	uint8_t interrupt = magic_lut[(uint64_t)(pending * 0x022FDD63CC95386DULL) >> 58];
+	interrupt_handler_t handler = interrupt_handlers[interrupt];
 	if (handler != NULL) {
 		handler();
 	}
@@ -107,7 +103,6 @@ void interrupt_handler(u64 pending)
 void enable_interrupts(void)
 {
 	u32 cpsr;
-
 	asm("mrs %0, cpsr" : "=r" (cpsr));
 	cpsr &= ~(0x80);
 	asm("msr cpsr, %0" :: "r" (cpsr));
@@ -116,7 +111,6 @@ void enable_interrupts(void)
 void disable_interrupts(void)
 {
 	u32 cpsr;
-
 	asm("mrs %0, cpsr" : "=r" (cpsr));
 	cpsr |= 0x80;
 	asm("msr cpsr, %0" :: "r" (cpsr));

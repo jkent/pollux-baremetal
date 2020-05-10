@@ -19,8 +19,6 @@
 
 #include <stdbool.h>
 
-extern void *main_tlb;
-
 extern void icache_invalidate(void);
 extern void icache_enable(void);
 extern void icache_disable(void);

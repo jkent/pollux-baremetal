@@ -23,17 +23,16 @@
 
 void startup(void)
 {
-#if defined(CONFIG_BAREMETAL_ENABLE_ICACHE)
+#if defined(CONFIG_BAREMETAL_ICACHE)
     icache_enable();
 #endif
 
-#if defined(CONIFG_BAREMETAL_ENABLE_MMU)
-    init_tlb(main_tlb);
-    assign_tlb(main_tlb);
-    mmu_enable()
+#if defined(CONFIG_BAREMETAL_MMU)
+    mmu_init();
+    mmu_enable();
 #endif
 
-#if defined(CONFIG_BAREMETAL_ENABLE_DCACHE)
+#if defined(CONFIG_BAREMETAL_DCACHE)
     dcache_enable();
 #endif
 
@@ -45,7 +44,7 @@ void startup(void)
     ddr_init();
 #endif
 
-    u32 ram_top = get_ram_size(); 
+    u32 ram_top = get_ram_size();
 #if !defined(CONFIG_BAREMETAL_SHADOW)
     ram_top += 0x80000000l;
 #endif

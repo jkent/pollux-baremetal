@@ -76,9 +76,15 @@ SECTIONS
     __bss_start__ = .;
     *(.bss .bss.*)
     *(COMMON)
-#if defined(CONFIG_BAREMETAL_ENABLE_MMU)
+#if defined(CONFIG_BAREMETAL_MMU)
     main_tlb = ALIGN(0x4000);
     . = main_tlb + 0x4000;
+#if defined(CONFIG_BAREMETAL_INTERRUPTS)
+    ivt_tlb = ALIGN(0x1000);
+    . = ivt_tlb + 0x1000;
+    ivt_phys = ALIGN(0x1000);
+    . = ivt_phys + 0x1000;
+#endif
 #endif
     __bss_end__ = .;
   } > ram

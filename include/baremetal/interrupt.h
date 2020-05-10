@@ -23,6 +23,9 @@ typedef void (*interrupt_handler_t)(void);
 
 interrupt_handler_t interrupt_handlers[64];
 
+extern u32 *ivt_tlb[0x400];
+extern u32 *ivt_phys[0x400];
+
 extern void interrupt_handler(u64 pending);
 extern void enable_interrupts(void);
 extern void disable_interrupts(void);

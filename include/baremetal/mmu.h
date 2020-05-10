@@ -20,7 +20,9 @@
 #include <asm/types.h>
 #include <stdbool.h>
 
-void mmu_init_tlb(u32 *tlb);
-void mmu_assign_tlb(u32 *tlb);
+extern u32 main_tlb[0x1000];
+
+void mmu_init(void);
+void mmu_load(void);
 void mmu_enable(void);
 void mmu_disable(void);
