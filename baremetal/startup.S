@@ -57,8 +57,8 @@ startup:
     bl get_ram_size
 #if !defined(CONFIG_BAREMETAL_SHADOW)
     orr r0, r0, #0x80000000
-    msr cpsr_c, #
 #endif
+	mov sp, r0
 #if defined(CONFIG_BAREMETAL_INTERRUPTS)
 	mov	sp, r0
 	msr	cpsr_c, #DISABLE_FIQ | DISABLE_IRQ | MODE_FIQ
@@ -82,8 +82,12 @@ startup:
     bl enable_interrupts
 #endif
 
+	bl __libc_init_array
+	ldr r0, =__libc_fini_array
+	bl atexit
+
     bl main
-    bl halt
+	bl exit
 
 .ltorg
 .end

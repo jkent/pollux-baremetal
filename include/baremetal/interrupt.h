@@ -23,7 +23,6 @@ typedef void (*irq_handler_t)(void);
 
 extern u32 *ivt_tlb[0x400];
 extern u32 *ivt_phys[0x400];
-extern u32 *ivt;
 
 extern irq_handler_t *swi_handlers;
 extern irq_handler_t *irq_handlers;

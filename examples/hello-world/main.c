@@ -17,33 +17,11 @@
  */
 
 #include <asm/types.h>
-#include <driver/early_uart.h>
 #include <stdio.h> 
-
-int putchar(int c)
-{
-    if (c == '\n') {
-        early_write_u8((u8)'\r');
-    }
-    early_write_u8((u8)c);
-    return c;
-}
-
-int puts(const char *s)
-{
-    while (*s) {
-        if (!putchar(*s++)) {
-            return EOF;
-        }
-    }
-    return putchar('\n');
-}
+#include <stdlib.h>
 
 int main(void)
 {
-    puts("Hello world!");
-
-    while(1)
-        ;
+    printf("Hello world\r\n");
     return 0;
 }

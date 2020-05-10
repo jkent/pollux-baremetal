@@ -47,11 +47,30 @@ SECTIONS
 #endif
   } > ram
 
-  .text :
-  {
-    *(.text._startup)
-    *(.text.startup) /* place main first */
+  .text : {
+    *(.text._startup) /* startup code */
+    *(.text.startup) /* main first */
     *(.text.* .text .stub)
+  } > ram
+
+  .preinit_array : {
+    PROVIDE_HIDDEN (__preinit_array_start = .);
+    KEEP (*(.preinit_array*))
+    PROVIDE_HIDDEN (__preinit_array_end = .);
+  } > ram
+
+  .init_array : {
+    PROVIDE_HIDDEN (__init_array_start = .);
+    KEEP (*(SORT(.init_array.*)))
+    KEEP (*(.init_array*))
+    PROVIDE_HIDDEN (__init_array_end = .);
+  } > ram
+
+  .fini_array : {
+    PROVIDE_HIDDEN (__fini_array_start = .);
+    KEEP (*(SORT(.fini_array.*)))
+    KEEP (*(.fini_array*))
+    PROVIDE_HIDDEN (__fini_array_end = .);
   } > ram
 
   .rodata :
@@ -89,13 +108,14 @@ SECTIONS
     __bss_end__ = .;
   } > ram
 
-  __heap_start__ = .;
-  __initial_stack_end__ = .;
+  __heap_start__ = __bss_end__;
+
   .stack :
   {
+    __initial_stack_end__ = .;
     . += CONFIG_BAREMETAL_INITIAL_STACK_SIZE;
+    __initial_stack_top__ = .;
   } > ram
-  __initial_stack_top__ = .;
 }
 
 #if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) || defined(BAREMETAL_BOOT_SOURCE_NAND)

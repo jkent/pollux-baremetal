@@ -20,13 +20,6 @@
 #include <asm/types.h>
 #include <mach/mcuy.h>
 
-__attribute__((weak,noreturn))
-void halt(void)
-{
-    while(1)
-        ;
-}
-
 u32 get_ram_size(void)
 {
 	u32 memcfg = readl(MCUY_BASE + MCUY_CFG);

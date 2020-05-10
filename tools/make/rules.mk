@@ -35,9 +35,8 @@ CXXFLAGS :=
 LDFLAGS = -Wl,--gc-sections -Wl,-Map=$(BUILD)/$(basename $(target)).map
 LIBS     = -lgcc $(libs-y)
 INCLUDE  = -include $(BUILD)/config.h $(addprefix -I,$(BUILD) $(includes))
-INSTRUCTION_SET := -mthumb
 
-cflags-y += -mlittle-endian -msoft-float -mtune=arm9tdmi -march=armv5te -mthumb-interwork -nostartfiles
+cflags-y += -mlittle-endian -msoft-float -mtune=arm9tdmi -march=armv5te -mthumb -mthumb-interwork -nostartfiles
 
 ifdef CONFIG_DEBUG
   cflags-y += -O0 -g3 -DDEBUG
@@ -85,7 +84,6 @@ all: $(BUILD)/$(target)
 .PHONY: deps
 deps: $(BUILD)/.
 	$(Q)rm -f $(BUILD)/deps.mk
-	$(Q)find $(BAREMETAL_PATH) -name \*.d -type f -exec sh -c 'cat {} >> $(BUILD)/deps.mk' \;
 	$(Q)find $(BUILD) -name \*.d -type f -exec sh -c 'cat {} >> $(BUILD)/deps.mk' \;
 -include $(BUILD)/deps.mk
 
@@ -108,13 +106,15 @@ $(BASEDIR)/.config config:
 	fi
 
 define generate_rules
+# .lds.S -> .lds
 $$(BUILD)/%.lds: $(1)/%.lds.S | $$(DEPS)
 	$$(D) "   CPP      $$<"
 	$$(Q)$$(CC) -E -P -MMD -MP -MF $$@.d -MQ $$@ -x c -DBUILD=$$(BUILD:./%=%) $$(INCLUDE) $$< -o $$@
 
+# .S -> .o
 $$(BUILD)/%.o: $(1)/%.S | $$(DEPS)
 	$$(D) "   AS       $$<"
-	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $(INSTRUCTION_SET) $$(ASFLAGS) $$(INCLUDE) $$< -o $$@
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(ASFLAGS) $$(INCLUDE) $$< -o $$@
 
 # .arm.c -> .arm.o
 $$(BUILD)/%.arm.o: $(1)/%.arm.c | $$(DEPS)
@@ -132,7 +132,7 @@ $$(BUILD)/%.thumb.o: $(1)/%.thumb.c | $$(DEPS)
 $$(BUILD)/%.o: $(1)/%.c | $$(DEPS)
 	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CC       $$<"
-	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $(INSTRUCTION_SET) $$(INCLUDE) $$< -o $$@
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(INCLUDE) $$< -o $$@
 
 # .arm.c -> .o
 $$(BUILD)/%.o: $(1)/%.arm.c | $$(DEPS)
@@ -158,11 +158,11 @@ $$(BUILD)/%.thumb.o: $(1)/%.thumb.cpp | $$(DEPS)
 	$$(D) "   CXX      $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -thumb $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
 
-# .o -> .o
+# .cpp -> .o
 $$(BUILD)/%.o: $(1)/%.cpp | $$(DEPS)
 	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CXX      $$<"
-	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $(INSTRUCTION_SET) $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
 
 # .arm.cpp -> .o
 $$(BUILD)/%.o: $(1)/%.arm.cpp | $$(DEPS)

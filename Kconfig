@@ -1,10 +1,10 @@
 mainmenu "POLLUX Baremetal Configuration"
 
-menuconfig BAREMETAL_USE_LINKER_SCRIPT
+menuconfig BAREMETAL_LINKER_SCRIPT
 	bool "Use baremetal linker script"
 	default y
 
-if BAREMETAL_USE_LINKER_SCRIPT
+if BAREMETAL_LINKER_SCRIPT
 choice BAREMETAL_BOOT_SOURCE
 	prompt "Boot source"
 config BAREMETAL_BOOT_SOURCE_RAM
@@ -43,25 +43,25 @@ config BAREMETAL_INITIAL_STACK_SIZE
 	default 0x4000
 endif
 
-config BAREMETAL_USE_ENTRY
-menuconfig BAREMETAL_USE_ENTRY
-	depends on BAREMETAL_USE_LINKER_SCRIPT
+config BAREMETAL_ENTRY
+menuconfig BAREMETAL_ENTRY
+	depends on BAREMETAL_LINKER_SCRIPT
 	bool "Use baremetal entry code"
 	default y
 
-if BAREMETAL_USE_ENTRY
+if BAREMETAL_ENTRY
 config BAREMETAL_AUTO_RELOCATE
 	bool "Auto relocate"
 	default y
 endif
 
-config BAREMETAL_USE_EARLY
-menuconfig BAREMETAL_USE_EARLY
-	depends on BAREMETAL_USE_ENTRY
+config BAREMETAL_EARLY
+menuconfig BAREMETAL_EARLY
+	depends on BAREMETAL_ENTRY
 	bool "Use baremetal early code"
 	default y
 
-if BAREMETAL_USE_EARLY
+if BAREMETAL_EARLY
 config BAREMETAL_LATCH_POWER
 	bool "Latch power"
 	default y
@@ -69,13 +69,13 @@ config BAREMETAL_LATCH_POWER
 	  Say Y here to enable latching power in startup code.
 endif
 
-config BAREMETAL_USE_STARTUP
-menuconfig BAREMETAL_USE_STARTUP
-	depends on BAREMETAL_USE_EARLY
+config BAREMETAL_STARTUP
+menuconfig BAREMETAL_STARTUP
+	depends on BAREMETAL_EARLY
 	bool "Use baremetal startup code"
 	default y
 
-if BAREMETAL_USE_STARTUP
+if BAREMETAL_STARTUP
 config BAREMETAL_ICACHE
 	bool "Enable ICache"
 	default y

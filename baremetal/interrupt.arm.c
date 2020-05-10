@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2020 Jeff Kent <jeff@jkent.net>
+ * Copyright (C) 2020 Jeff Kent <jeff@jkent.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -77,9 +77,7 @@ void irq_handler(void)
 	u32 pendl = readl(IRQ_BASE + IRQ_PENDL);
 	u64 pending = (u64)pendh << 32 | pendl;
 	uint8_t irq = magic_lut[(uint64_t)(pending * 0x022FDD63CC95386DULL) >> 58];
-
 	writel(0, IRQ_BASE + irq < 32 ? IRQ_PENDL : IRQ_PENDH);
-
 	irq_handler_t handler = irq_handlers[irq];
 	if (handler != NULL) {
 		handler();
@@ -108,8 +106,8 @@ void init_interrupts(void)
 	ivt[14] = (u32)irq_handler;
 	ivt[15] = (u32)fiq_handler;
 
+	irq_handlers = (irq_handler_t *)(ivt + 64);
 	swi_handlers = (irq_handler_t *)(ivt + 1024);
-	irq_handlers = (irq_handler_t *)(ivt + 2048);
 
 	/* set high vectors */
 	u32 cr;

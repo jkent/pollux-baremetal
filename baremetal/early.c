@@ -40,11 +40,11 @@ EARLY_CODE NAKED void early_startup(void)
 	startup_load_rest();
 #endif
 
-#if defined(CONFIG_BAREMETAL_USE_STARTUP)
+#if defined(CONFIG_BAREMETAL_STARTUP)
 	startup();
 #else
 	main();
-	halt();
+	_exit();
 #endif
 }
 

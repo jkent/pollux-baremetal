@@ -61,5 +61,4 @@
 
 void startup(void);
 void main(void);
-void __attribute__((noreturn)) halt(void);
 u32 get_ram_size(void);
