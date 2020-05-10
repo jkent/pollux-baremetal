@@ -112,7 +112,36 @@ endchoice
 config BAREMETAL_DDR_INIT
 	bool "Initialize DDR"
 	default y
-	select BAREMETAL_CLOCKING
+
+config BAREMETAL_INTERRUPTS
+	depends on BAREMETAL_MMU
+	bool "Setup interrupts"
+	default y
+
+config BAREMETAL_FIQ_STACK_SIZE
+	depends on BAREMETAL_INTERRUPTS
+	hex "FIQ mode stack size"
+	default 0x1000
+
+config BAREMETAL_IRQ_STACK_SIZE
+	depends on BAREMETAL_INTERRUPTS
+	hex "IRQ mode stack size"
+	default 0x1000
+
+config BAREMETAL_SVC_STACK_SIZE
+	depends on BAREMETAL_INTERRUPTS
+	hex "SVC (Service) stack size"
+	default 0x1000
+
+config BAREMETAL_ABT_STACK_SIZE
+	depends on BAREMETAL_INTERRUPTS
+	hex "ABT (abort) mode stack size"
+	default 0x1000
+
+config BAREMETAL_UND_STACK_SIZE
+	depends on BAREMETAL_INTERRUPTS
+	hex "UND (undefined) mode stack size"
+	default 0x1000
 
 choice BAREMETAL_UART
 	prompt "UART implementation"

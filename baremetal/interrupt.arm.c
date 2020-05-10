@@ -15,10 +15,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#define CR_V (1 << 13)
+
+#include <asm/io.h>
+#include <mach/interrupt.h>
 #include <baremetal/interrupt.h>
 #include <stddef.h>
 
-interrupt_handler_t irq_handlers[64] = {0};
+irq_handler_t *swi_handlers;
+irq_handler_t *irq_handlers;
+u32 *ivt;
 
 static const uint8_t magic_lut[64] = {
 	 0,  1,  2, 53,  3,  7, 54, 27,  4, 38, 41,  8, 34, 55, 48, 28,
@@ -40,6 +46,13 @@ void undef_handler(void)
 __attribute__((interrupt("SWI"), weak))
 void swi_handler(void)
 {
+	u32 swi;
+	asm("ldr %0, [lr, #-4]" : "=r" (swi));
+	swi &= ~0x000003FF;
+	irq_handler_t handler = swi_handlers[swi];
+	if (handler != NULL) {
+		handler();
+	}
 }
 
 __attribute__((interrupt("ABORT"), weak))
@@ -60,6 +73,17 @@ void reserved_handler(void)
 __attribute__((interrupt("IRQ"), weak))
 void irq_handler(void)
 {
+	u32 pendh = readl(IRQ_BASE + IRQ_PENDH) & 0x00000FFF;
+	u32 pendl = readl(IRQ_BASE + IRQ_PENDL);
+	u64 pending = (u64)pendh << 32 | pendl;
+	uint8_t irq = magic_lut[(uint64_t)(pending * 0x022FDD63CC95386DULL) >> 58];
+
+	writel(0, IRQ_BASE + irq < 32 ? IRQ_PENDL : IRQ_PENDH);
+
+	irq_handler_t handler = irq_handlers[irq];
+	if (handler != NULL) {
+		handler();
+	}
 }
 
 __attribute__((interrupt("FIQ"), weak))
@@ -67,37 +91,31 @@ void fiq_handler(void)
 {
 }
 
-void setup_vector_table(void)
+void init_interrupts(void)
 {
-#if CONFIG_USE_HIGH_INTERRUPTS
-	u32 *vectors = (u32 *)0xFFFF0000;
-#else
-	u32 *vectors = (u32 *)0x00000000;
-#endif
+	ivt = (u32 *)0xFFFF0000;
 
 	for (int i = 0; i < 8; i++) {
-		vectors[i] = 0xE59FF018; /* ldr pc, [pc, #24] */
+		ivt[i] = 0xE59FF018; /* ldr pc, [pc, #24] */
 	}
 
-	vectors[8] = (u32)reset_handler;
-	vectors[9] = (u32)undef_handler;
-	vectors[10] = (u32)swi_handler;
-	vectors[11] = (u32)pabort_handler;
-	vectors[12] = (u32)dabort_handler;
-	vectors[13] = (u32)reserved_handler;
-	vectors[14] = (u32)irq_handler;
-	vectors[15] = (u32)fiq_handler;
-}
+	ivt[8] = (u32)reset_handler;
+	ivt[9] = (u32)undef_handler;
+	ivt[10] = (u32)swi_handler;
+	ivt[11] = (u32)pabort_handler;
+	ivt[12] = (u32)dabort_handler;
+	ivt[13] = (u32)reserved_handler;
+	ivt[14] = (u32)irq_handler;
+	ivt[15] = (u32)fiq_handler;
 
-/* pending is guaranteed to have only one bit set at a time */
-void interrupt_handler(u64 pending)
-{
-	pending &= 0x00000FFFFFFFFFFFULL;
-	uint8_t interrupt = magic_lut[(uint64_t)(pending * 0x022FDD63CC95386DULL) >> 58];
-	interrupt_handler_t handler = interrupt_handlers[interrupt];
-	if (handler != NULL) {
-		handler();
-	}
+	swi_handlers = (irq_handler_t *)(ivt + 1024);
+	irq_handlers = (irq_handler_t *)(ivt + 2048);
+
+	/* set high vectors */
+	u32 cr;
+	asm("mrc p15, 0, %0, c1, c0, 0" : "=r" (cr) :: "cc");
+	cr |= CR_V;
+	asm("mcr p15, 0, %0, c1, c0, 0" :: "r" (cr));
 }
 
 void enable_interrupts(void)

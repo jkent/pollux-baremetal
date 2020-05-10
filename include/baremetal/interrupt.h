@@ -19,13 +19,25 @@
 
 #include <asm/types.h>
 
-typedef void (*interrupt_handler_t)(void);
-
-interrupt_handler_t interrupt_handlers[64];
+typedef void (*irq_handler_t)(void);
 
 extern u32 *ivt_tlb[0x400];
 extern u32 *ivt_phys[0x400];
+extern u32 *ivt;
 
-extern void interrupt_handler(u64 pending);
-extern void enable_interrupts(void);
-extern void disable_interrupts(void);
+extern irq_handler_t *swi_handlers;
+extern irq_handler_t *irq_handlers;
+
+void init_interrupts(void);
+void interrupt_handler(u64 pending);
+void enable_interrupts(void);
+void disable_interrupts(void);
+
+void reset_handler(void);
+void undef_handler(void);
+void swi_handler(void);
+void pabort_handler(void);
+void dabort_handler(void);
+void reserved_handler(void);
+void irq_handler(void);
+void fiq_handler(void);
