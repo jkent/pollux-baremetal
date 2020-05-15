@@ -70,12 +70,12 @@ int _kill_r(struct _reent *ptr, int pid, int sig)
     return -1;
 }
 
-int _lseek_r(struct _reent *ptr, int file, int offset, int whence)
+_off_t _lseek_r(struct _reent *ptr, int file, _off_t offset, int whence)
 {
     return  0;
 }
 
-int _read(struct _reent *ptr, int fd, char *buf, int count)
+_ssize_t _read(struct _reent *ptr, int fd, void *buf, size_t count)
 {
     return -1;
 }
@@ -102,12 +102,7 @@ void *_sbrk_r(struct _reent *ptr, ptrdiff_t incr)
 }
 #endif
 
-/*void *_sbrk(int incr)
-{
-	return _sbrk_r(_REENT, incr);
-}*/ 
-
-int _write_r(struct _reent *ptr, int fd, char *buf, int count)
+_ssize_t _write_r(struct _reent *ptr, int fd, const void *buf, size_t count)
 {
     int written = 0;
 
@@ -117,10 +112,10 @@ int _write_r(struct _reent *ptr, int fd, char *buf, int count)
     }
 
     for (; count != 0; --count) {
-        if (*buf == '\n') {
+        if (*(char *)buf == '\n') {
             uart0_writeb('\r');
         }
-        uart0_writeb(*buf++);
+        uart0_writeb(*(char *)buf++);
         ++written;
     }
     return written;
