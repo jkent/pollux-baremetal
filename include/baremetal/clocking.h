@@ -20,4 +20,5 @@
 #include <asm/types.h>
 
 void pll0_init(void);
+void pll1_init(void);
 void ddr_init(void);

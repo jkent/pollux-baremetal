@@ -23,6 +23,6 @@
 extern u32 main_tlb[0x1000];
 
 void mmu_init(void);
-void mmu_load(void);
+void mmu_load(void *main_tlb);
 void mmu_enable(void);
 void mmu_disable(void);

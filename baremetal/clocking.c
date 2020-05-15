@@ -17,19 +17,19 @@
 
 #include <asm/io.h>
 #include <asm/types.h>
+#include <driver/uart.h>
 #include <mach/clkpwr.h>
 #include <mach/mcuy.h>
 
 void pll0_init(void)
 {
-	u32 cfg;
 	void __iomem *clkpwr = (void __iomem *) CLKPWR_BASE;
 
 	/* 533 MHz PLL */
 	writel(CLKPWR_PLL(24, 948, 1), clkpwr + CLKPWR_PLL0);
 
 	/* 533 MHz CPU, 133 MHz AHB, 133 MHz DDR, 66 MHz APB */
-	cfg = readl(clkpwr + CLKPWR_CLKMODE);
+	u32 cfg = readl(clkpwr + CLKPWR_CLKMODE);
 	cfg &= ~(CLKPWR_CLKMODE_BCLKDIV_MASK | CLKPWR_CLKMODE_AHBDIV_MASK
 			| CLKPWR_CLKMODE_CPUDIV_MASK);
 	cfg |= CLKPWR_CLKMODE_BCLKDIV(3) | CLKPWR_CLKMODE_AHBDIV(3)
@@ -41,6 +41,22 @@ void pll0_init(void)
 	writel(cfg, clkpwr + CLKPWR_PWRMODE);
 
 	while (readl(clkpwr + CLKPWR_PWRMODE) & CLKPWR_PWRMODE_CHGPLL);
+}
+
+void pll1_init(void)
+{
+	void __iomem *clkpwr = (void __iomem *) CLKPWR_BASE;
+
+	/* 120 MHz PLL */
+	writel(CLKPWR_PLL(27, 240, 1), clkpwr + CLKPWR_PLL1);
+
+	u32 cfg = readl(clkpwr + CLKPWR_PWRMODE);
+	cfg |= CLKPWR_PWRMODE_CHGPLL;
+	writel(cfg, clkpwr + CLKPWR_PWRMODE);
+
+	while (readl(clkpwr + CLKPWR_PWRMODE) & CLKPWR_PWRMODE_CHGPLL);
+
+	uart0_init_baudinfo((12 << 16) | (4 << 4) | (1 << 1)); /* TODO: do this properly */
 }
 
 void ddr_init(void)

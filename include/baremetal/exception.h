@@ -19,24 +19,22 @@
 
 #include <asm/types.h>
 
+#define EXC_RESET (0)
+#define EXC_UNDEFINED (1)
+#define EXC_SWI (2)
+#define EXC_PREFETCH_ABORT (3)
+#define EXC_DATA_ABORT (4)
+#define EXC_RESERVED (5)
+#define EXC_IRQ (6)
+#define EXC_FIQ (7)
+
 typedef void (*irq_handler_t)(void);
-
-extern u32 *ivt_tlb[0x400];
-extern u32 *ivt_phys[0x400];
-
-extern irq_handler_t *swi_handlers;
-extern irq_handler_t *irq_handlers;
 
 void init_interrupts(void);
 void interrupt_handler(u64 pending);
 void enable_interrupts(void);
 void disable_interrupts(void);
 
-void reset_handler(void);
-void undef_handler(void);
-void swi_handler(void);
-void pabort_handler(void);
-void dabort_handler(void);
-void reserved_handler(void);
-void irq_handler(void);
-void fiq_handler(void);
+void install_exc(u8 num, irq_handler_t handler);
+void install_irq(u8 num, irq_handler_t handler);
+void install_swi(u8 num, irq_handler_t handler);

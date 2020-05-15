@@ -20,10 +20,10 @@
 
 #include <asm/types.h>
 
-void early_uart_init(u32 baudinfo);
-u8 early_read_u8(void);
-void early_write_u8(u8 c);
-u16 early_read_u16(void);
-void early_write_u16(u16 n);
-u32 early_read_u32(void);
-void early_write_u32(u32 n);
+void uart0_init_baudinfo(u32 baudinfo);
+u8 uart0_readb(void);
+u16 uart0_readw(void);
+u32 uart0_readl(void);
+void uart0_writeb(u8 c);
+void uart0_writew(u16 n);
+void uart0_writel(u32 n);

@@ -16,12 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <asm/types.h>
 #include <stdio.h> 
-#include <stdlib.h>
 
 int main(void)
 {
-    printf("Hello world\r\n");
+    puts("Hello world!");
     return 0;
 }

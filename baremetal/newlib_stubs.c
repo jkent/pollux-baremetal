@@ -18,81 +18,20 @@
 
 #include <asm/types.h>
 #include <baremetal/linker.h>
-#include <driver/early_uart.h>
+#include <driver/uart.h>
 #include <errno.h>
 #include <stdio.h>
 #include <sys/stat.h>
+#include <sys/unistd.h>
 
-extern u32 __heap_start__;
+#if defined(CONFIG_BAREMETAL_FREERTOS)
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#endif
 
-int _close(int fd)
+int _close_r(struct _reent *ptr, int fd)
 {
     return -1;
-}
-
-void _fini(void)
-{
-}
-
-int _fstat(int file, struct stat *st)
-{
-    st->st_mode = S_IFCHR;
-    return 0;
-}
-
-void _init(void)
-{
-}
-
-int _isatty(int file)
-{
-    return  1;
-}
-
-int _lseek(int file, int offset, int whence)
-{
-    return  0;
-}
-
-int _read(int fd, char *buf, int count)
-{
-    return -1;
-}
-
-caddr_t _sbrk(ptrdiff_t incr)
-{
-    static caddr_t heap = NULL;
-
-    if (heap == NULL) {
-        heap = (caddr_t)&__heap_start__;
-    }
-
-    caddr_t prev_heap = heap;
-    register caddr_t sp __asm__("sp");
-    if (heap + incr > sp) {
-        errno = ENOMEM;
-        return (caddr_t) -1;
-    }
-
-    heap += incr;
-
-    return prev_heap;
-}
-
-int _write(int fd, char *buf, int count)
-{
-    int written = 0;
-
-    if (fd != 1 && fd != 2) {
-        errno = EBADF;
-        return -1;
-    }
-
-    for (; count != 0; --count) {
-        early_write_u8(*buf++);
-        ++written;
-    }
-    return written;
 }
 
 void _exit(int status)
@@ -100,3 +39,102 @@ void _exit(int status)
     while (1)
         ;
 }
+
+void _fini(void)
+{
+}
+
+int _fstat_r(struct _reent *ptr, int file, struct stat *st)
+{
+    st->st_mode = S_IFCHR;
+    return 0;
+}
+
+int _getpid_r(struct _reent *ptr)
+{
+    return  1;
+}
+
+void _init(void)
+{
+}
+
+int _isatty_r(struct _reent *ptr, int file)
+{
+    return  1;
+}
+
+int _kill_r(struct _reent *ptr, int pid, int sig)
+{
+    ptr->_errno = EINVAL;
+    return -1;
+}
+
+int _lseek_r(struct _reent *ptr, int file, int offset, int whence)
+{
+    return  0;
+}
+
+int _read(struct _reent *ptr, int fd, char *buf, int count)
+{
+    return -1;
+}
+
+#if !defined(CONFIG_BAREMETAL_FREERTOS)
+register void *stack_ptr asm("sp");
+
+void *_sbrk_r(struct _reent *ptr, ptrdiff_t incr)
+{
+	static void *current_heap_end = NULL;
+
+	if (current_heap_end == NULL) {
+		current_heap_end = &_heap_bottom;
+	}
+
+	void *previous_heap_end = current_heap_end;
+	if (current_heap_end + incr > stack_ptr) {
+		ptr->_errno = ENOMEM;
+		return (void *)-1;
+	}
+
+	current_heap_end += incr;
+	return previous_heap_end;
+}
+#endif
+
+/*void *_sbrk(int incr)
+{
+	return _sbrk_r(_REENT, incr);
+}*/ 
+
+int _write_r(struct _reent *ptr, int fd, char *buf, int count)
+{
+    int written = 0;
+
+    if (fd != 1 && fd != 2) {
+        ptr->_errno = EBADF;
+        return -1;
+    }
+
+    for (; count != 0; --count) {
+        if (*buf == '\n') {
+            uart0_writeb('\r');
+        }
+        uart0_writeb(*buf++);
+        ++written;
+    }
+    return written;
+}
+
+
+#if defined(CONFIG_BAREMETAL_FREERTOS)
+void __env_lock()
+{
+    vTaskSuspendAll();
+};
+
+void __env_unlock()
+{
+    (void)xTaskResumeAll();
+};
+#endif

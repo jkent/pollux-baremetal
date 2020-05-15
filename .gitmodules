@@ -4,3 +4,6 @@
 [submodule "tools/micromon"]
 	path = tools/micromon
 	url = https://github.com/jkent/pollux-micromon
+[submodule "freertos"]
+	path = freertos
+	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git

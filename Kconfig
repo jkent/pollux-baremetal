@@ -1,10 +1,5 @@
 mainmenu "POLLUX Baremetal Configuration"
 
-menuconfig BAREMETAL_LINKER_SCRIPT
-	bool "Use baremetal linker script"
-	default y
-
-if BAREMETAL_LINKER_SCRIPT
 choice BAREMETAL_BOOT_SOURCE
 	prompt "Boot source"
 config BAREMETAL_BOOT_SOURCE_RAM
@@ -20,6 +15,30 @@ config BAREMETAL_BOOT_SOURCE_NOR
 	depends on NOT_IMPLEMENTED
 endchoice
 
+choice BAREMETAL_RAM_SIZE
+	prompt "RAM size"
+config BAREMETAL_RAM_SIZE_16
+	bool "16M MiB"
+config BAREMETAL_RAM_SIZE_32
+	bool "32 MiB"
+config BAREMETAL_RAM_SIZE_64
+	bool "64 MiB"
+config BAREMETAL_RAM_SIZE_128
+	bool "128 MiB"
+endchoice
+
+config BAREMETAL_RAM_SIZE
+	hex
+	default 0x1000000 if BAREMETAL_RAM_SIZE_16
+	default 0x2000000 if BAREMETAL_RAM_SIZE_32
+	default 0x4000000 if BAREMETAL_RAM_SIZE_64
+	default 0x8000000 if BAREMETAL_RAM_SIZE_128
+
+menuconfig BAREMETAL_LINKER_SCRIPT
+	bool "Use baremetal linker script"
+	default y
+
+if BAREMETAL_LINKER_SCRIPT
 config BAREMETAL_SHADOW
 	bool "Shadow RAM" if BAREMETAL_BOOT_SOURCE_RAM
 	default y if BAREMETAL_BOOT_SOURCE_RAM
@@ -28,8 +47,7 @@ config BAREMETAL_SHADOW
 	help
 	  If enabled, DDR (MCU-Y) starts at physical address 0x00000000 and
 	  the static bus (MCU-S) starts at 0x80000000.  Otherwise these two
-	  1GB memory spaces are reversed.  Under most circumstances you want
-	  this enabled.
+	  1GB memory spaces are reversed.  Ususally you want this enabled.
 
 config BAREMETAL_RUNTIME_ADDRESS
 	hex "Runtime address"
@@ -37,15 +55,10 @@ config BAREMETAL_RUNTIME_ADDRESS
 	default 0x80000000 if !BAREMETAL_SHADOW
 	range 0x00000000 0x07FFFFFF if BAREMETAL_SHADOW
 	range 0x80000000 0x87FFFFFF if !BAREMETAL_SHADOW
-
-config BAREMETAL_INITIAL_STACK_SIZE
-	hex "Initial stack size"
-	default 0x4000
 endif
 
 config BAREMETAL_ENTRY
 menuconfig BAREMETAL_ENTRY
-	depends on BAREMETAL_LINKER_SCRIPT
 	bool "Use baremetal entry code"
 	default y
 
@@ -53,15 +66,7 @@ if BAREMETAL_ENTRY
 config BAREMETAL_AUTO_RELOCATE
 	bool "Auto relocate"
 	default y
-endif
 
-config BAREMETAL_EARLY
-menuconfig BAREMETAL_EARLY
-	depends on BAREMETAL_ENTRY
-	bool "Use baremetal early code"
-	default y
-
-if BAREMETAL_EARLY
 config BAREMETAL_LATCH_POWER
 	bool "Latch power"
 	default y
@@ -71,17 +76,44 @@ endif
 
 config BAREMETAL_STARTUP
 menuconfig BAREMETAL_STARTUP
-	depends on BAREMETAL_EARLY
+	depends on BAREMETAL_ENTRY
 	bool "Use baremetal startup code"
 	default y
 
 if BAREMETAL_STARTUP
-config BAREMETAL_ICACHE
-	bool "Enable ICache"
+config BAREMETAL_NEWLIB
+	bool "Use Newlib"
 	default y
-	help
-	  Say Y here to enable the instruction cache.  In almost all
-	  circumstances you want this.
+
+config BAREMETAL_FREERTOS
+config BAREMETAL_FREERTOS
+	#depends on BAREMETAL_NEWLIB
+	bool "Use FreeRTOS"
+	default y
+
+config BAREMETAL_EXCEPTION
+	bool "Setup exceptions"
+	default y
+
+config BAREMETAL_FIQ_STACK_SIZE
+	depends on BAREMETAL_EXCEPTION
+	hex "FIQ mode stack size"
+	default 0x1000
+
+config BAREMETAL_IRQ_STACK_SIZE
+	depends on BAREMETAL_EXCEPTION
+	hex "IRQ mode stack size"
+	default 0x1000
+
+config BAREMETAL_ABT_STACK_SIZE
+	depends on BAREMETAL_EXCEPTION
+	hex "ABT (abort) mode stack size"
+	default 0x1000
+
+config BAREMETAL_UND_STACK_SIZE
+	depends on BAREMETAL_EXCEPTION
+	hex "UND (undefined) mode stack size"
+	default 0x1000
 
 config BAREMETAL_MMU
 	bool "Enable MMU"
@@ -97,6 +129,13 @@ config BAREMETAL_DCACHE
 	help
 	  Say Y here to enable the data cache.
 
+config BAREMETAL_ICACHE
+	bool "Enable ICache"
+	default y
+	help
+	  Say Y here to enable the instruction cache.  In almost all
+	  circumstances you want this.
+
 choice BAREMETAL_PLL0_INIT
 	prompt "Initialize PLL0"
 	default BAREMETAL_PLL0_INIT_533
@@ -104,49 +143,30 @@ choice BAREMETAL_PLL0_INIT
 	help
 	  PLL0 is the clock source for the ARM9 CPU. It is initially 384 MHz.
 config BAREMETAL_PLL0_INIT_NONE
-	bool "None"
+	bool "No"
 config BAREMETAL_PLL0_INIT_533
 	bool "533 MHz"
+endchoice
+
+choice BAREMETAL_PLL1_INIT
+	prompt "Initialize PLL1"
+	default BAREMETAL_PLL1_INIT_120
+	help
+	  PLL1 is the clock source for periperhals.  It is initially 147.461538 MHz.
+config BAREMETAL_PLL1_INIT_NONE
+	bool "No"
+config BAREMETAL_PLL1_INIT_120
+	bool "120 MHz"
 endchoice
 
 config BAREMETAL_DDR_INIT
 	bool "Initialize DDR"
 	default y
 
-config BAREMETAL_INTERRUPTS
-	depends on BAREMETAL_MMU
-	bool "Setup interrupts"
-	default y
-
-config BAREMETAL_FIQ_STACK_SIZE
-	depends on BAREMETAL_INTERRUPTS
-	hex "FIQ mode stack size"
-	default 0x1000
-
-config BAREMETAL_IRQ_STACK_SIZE
-	depends on BAREMETAL_INTERRUPTS
-	hex "IRQ mode stack size"
-	default 0x1000
-
-config BAREMETAL_SVC_STACK_SIZE
-	depends on BAREMETAL_INTERRUPTS
-	hex "SVC (Service) stack size"
-	default 0x1000
-
-config BAREMETAL_ABT_STACK_SIZE
-	depends on BAREMETAL_INTERRUPTS
-	hex "ABT (abort) mode stack size"
-	default 0x1000
-
-config BAREMETAL_UND_STACK_SIZE
-	depends on BAREMETAL_INTERRUPTS
-	hex "UND (undefined) mode stack size"
-	default 0x1000
-
 choice BAREMETAL_UART
 	prompt "UART implementation"
-	default BAREMETAL_UART_FIFO if BAREMETAL_INTERRUPTS
-	default BAREMETAL_UART_POLLED if !BAREMETAL_INTERRUPTS
+	default BAREMETAL_UART_FIFO if BAREMETAL_EXCEPTION
+	default BAREMETAL_UART_POLLED if !BAREMETAL_EXCEPTION
 config BAREMETAL_UART_NONE
 	bool "None"
 config BAREMETAL_UART_POLLED
@@ -155,6 +175,6 @@ config BAREMETAL_UART_POLLED
 config BAREMETAL_UART_FIFO
 	bool "FIFO"
 	depends on NOT_IMPLEMENTED
-	depends on BAREMETAL_INTERRUPTS
+	depends on BAREMETAL_EXCEPTION
 endchoice
 endif

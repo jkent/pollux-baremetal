@@ -20,11 +20,14 @@
 
 #include <asm/types.h>
 
-#define EARLY_CODE __attribute__((section (".text.early")))
-#define EARLY_RODATA __attribute__((section (".rodata.early")))
-#define STARTUP_CODE __attribute__((seciton (".text._startup")))
-#define STARTUP_RODATA __attribute__((seciton (".rodata._startup")))
-#define NAKED __attribute__((naked))
-
-extern u32 __reloc_start__;
-extern u32 __reloc_end__;
+extern char _reloc_start;
+extern char _reloc_end;
+extern char _bss;
+extern char _main_tlb;
+extern char _exc_tlb;
+extern char _exc_phys;
+extern char _swi_table;
+extern char _irq_table;
+extern char _ebss;
+extern char _heap_bottom;
+extern char _stack_top;

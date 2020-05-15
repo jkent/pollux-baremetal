@@ -23,40 +23,38 @@ ENTRY(_entry)
 MEMORY
 {
 #if defined(CONFIG_BAREMETAL_SHADOW)
-  ram : o = 0x00000000, l = 256M
+  ram : o = 0x00000000, l = CONFIG_BAREMETAL_RAM_SIZE
   rom : o = 0x80000000, l = 64M
 #else
   rom : o = 0x00000000, l = 64M
-  ram : o = 0x80000000, l = 256M
+  ram : o = 0x80000000, l = CONFIG_BAREMETAL_RAM_SIZE
 #endif
 }
 
 SECTIONS
 {
   .entry : {
-    *(.text.entry .rodata.entry)
+    *(.text.entry)
   } > ram 
 
-  .early CONFIG_BAREMETAL_RUNTIME_ADDRESS + SIZEOF(.entry) :
+  .entry_thumb CONFIG_BAREMETAL_RUNTIME_ADDRESS + SIZEOF(.entry) :
   AT(ADDR(.entry) + SIZEOF(.entry))
   {
-    __reloc_start__ = . - SIZEOF(.entry);
-    *(.text.early .rodata.early)
-#if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) || defined(BAREMETAL_BOOT_SOURCE_NAND)
-    . = ALIGN(512);
-#endif
+    _reloc_start = . - SIZEOF(.entry);
+    *(.text.entry_thumb)
+    . = ALIGN(8);
   } > ram
 
   .text : {
-    *(.text._startup) /* startup code */
-    *(.text.startup) /* main first */
-    *(.text.* .text .stub)
+    *(.text.* .text)
+    . = ALIGN(8);
   } > ram
 
   .preinit_array : {
     PROVIDE_HIDDEN (__preinit_array_start = .);
     KEEP (*(.preinit_array*))
     PROVIDE_HIDDEN (__preinit_array_end = .);
+    . = ALIGN(8);
   } > ram
 
   .init_array : {
@@ -64,6 +62,7 @@ SECTIONS
     KEEP (*(SORT(.init_array.*)))
     KEEP (*(.init_array*))
     PROVIDE_HIDDEN (__init_array_end = .);
+    . = ALIGN(8);
   } > ram
 
   .fini_array : {
@@ -71,54 +70,65 @@ SECTIONS
     KEEP (*(SORT(.fini_array.*)))
     KEEP (*(.fini_array*))
     PROVIDE_HIDDEN (__fini_array_end = .);
+    . = ALIGN(8);
   } > ram
 
   .rodata :
   {
     *(.rodata)
+    . = ALIGN(8);
   } > ram
 
 	.got :
   {
     *(.got.plt) *(.igot.plt) *(.got) *(.igot)
+    . = ALIGN(8);
   } > ram
 
   .data :
   {
     *(.data .data.*)
+    . = ALIGN(8);
   } > ram
-  . = ALIGN(8);
-  __reloc_end__ = .;
+  _reloc_end = .;
 
   .bss :
   {
-    __bss_start__ = .;
-    *(.bss .bss.*)
+    _bss = .;
+    *(.bss*)
     *(COMMON)
 #if defined(CONFIG_BAREMETAL_MMU)
-    main_tlb = ALIGN(0x4000);
-    . = main_tlb + 0x4000;
-#if defined(CONFIG_BAREMETAL_INTERRUPTS)
-    ivt_tlb = ALIGN(0x1000);
-    . = ivt_tlb + 0x1000;
-    ivt_phys = ALIGN(0x1000);
-    . = ivt_phys + 0x1000;
+    . = ALIGN(4096);
+    _main_tlb = .;
+    . += 4096;
+#if defined(CONFIG_BAREMETAL_EXCEPTION)
+    . = ALIGN(4096);
+    _exc_tlb = .;
+    . += 4096;
+    _exc_phys = .;
+    . += 1024;
 #endif
 #endif
-    __bss_end__ = .;
+#if defined(CONFIG_BAREMETAL_EXCEPTION)
+    _swi_table = .;
+    . += 1024;
+    _irq_table = .;
+    . += 256;
+#endif
+    . = ALIGN(8);
+    _ebss = .;
   } > ram
 
-  __heap_start__ = __bss_end__;
+  _heap_bottom = .;
 
-  .stack :
-  {
-    __initial_stack_end__ = .;
-    . += CONFIG_BAREMETAL_INITIAL_STACK_SIZE;
-    __initial_stack_top__ = .;
-  } > ram
+#if defined(CONFIG_BAREMETAL_SHADOW)
+  _stack_top = CONFIG_BAREMETAL_RAM_SIZE;
+#else
+  _stack_top = CONFIG_BAREMETAL_RAM_SIZE + 0x80000000;
+#endif
 }
 
 #if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) || defined(BAREMETAL_BOOT_SOURCE_NAND)
-ASSERT(SIZEOF(.entry) + SIZEOF(.early) <= 512,
-        "Early boot does not fit within 512 bytes")
+ASSERT(SIZEOF(.entry) + SIZEOF(.entry_thumb) <= 512,
+        "Entry code does not fit within 512 bytes")
 #endif

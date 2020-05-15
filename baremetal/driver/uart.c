@@ -17,8 +17,7 @@
  */
 
 #include <asm/io.h>
-#include <baremetal/linker.h>
-#include <driver/early_uart.h>
+#include <driver/uart.h>
 #include <mach/gpio.h>
 #include <mach/uart.h>
 #include <stddef.h>
@@ -28,66 +27,71 @@
  * default 147.461538 MHz and most of the UART registers are sane.  Tested
  * on the POLLUX VR3520F.
  */
-EARLY_CODE void early_uart_init(u32 baudinfo)
+void uart0_init_baudinfo(u32 baudinfo)
 {
+	void __iomem *uart = (void __iomem *)UART0_BASE;
+	void __iomem *gpio = (void __iomem *)GPIOA_BASE;
+
 	if (baudinfo == 0) {
-		baudinfo = (11 << 16) | (1 << 1) | (39 << 4);
+		baudinfo = (11 << 16) | (39 << 4) | (1 << 1);
 	}
 	u16 clkgen = baudinfo & 0xFFFF;
 	u16 brd = (baudinfo >> 16) & 0xFFFF;
 
 	/* Wait until the transmitter is done */
-	while (!(readw(UART0_BASE + UART_TRSTATUS) & UART_TRSTATUS_TXDONE))
+	while (!(readw(uart + UART_TRSTATUS) & UART_TRSTATUS_TXDONE))
 		;
 
 	/* Configure clock */
-	writew(clkgen, UART0_BASE + UART_CLKGEN);
+	writew(clkgen, uart + UART_CLKGEN);
 	/* Set baudrate divisor */
-	writew(brd, UART0_BASE + UART_BRD);
+	writew(brd, uart + UART_BRD);
 	/* Set GPIO as TX */
-	writel(GPIO_ALTFN_ALTFN1 << (8 * 2), GPIOA_BASE + GPIO_ALTFNL);
+	writel(GPIO_ALTFN_ALTFN1 << (8 * 2), gpio + GPIO_ALTFNL);
 	/* Enable TX and RX */
-	writel(UART_UCON_TRANSMODE_INTPOLL | UART_UCON_RECVMODE_INTPOLL, UART0_BASE + UART_UCON);
+	writel(UART_UCON_TRANSMODE_INTPOLL | UART_UCON_RECVMODE_INTPOLL, uart + UART_UCON);
 }
 
-EARLY_CODE u8 early_read_u8(void)
+u8 uart0_readb(void)
 {
-	while (!(readw(UART0_BASE + UART_TRSTATUS) & UART_TRSTATUS_RXREADY))
+	void __iomem *uart = (void __iomem *)UART0_BASE;
+	while (!(readw(uart + UART_TRSTATUS) & UART_TRSTATUS_RXREADY))
 		;
-	return readb(UART0_BASE + UART_RHB);
+	return readb(uart + UART_RHB);
 }
 
-EARLY_CODE void early_write_u8(u8 c)
-{
-	while (!(readw(UART0_BASE + UART_TRSTATUS) & UART_TRSTATUS_TXEMPTY))
-		;
-	writeb(c, UART0_BASE + UART_THB);
-}
-
-EARLY_CODE u16 early_read_u16(void)
+u16 uart0_readw(void)
 {
 	u16 n;
-	n = early_read_u8();
-	n |= early_read_u8() << 8;
+	n = uart0_readb();
+	n |= uart0_readb() << 8;
 	return n;
 }
 
-EARLY_CODE void early_write_u16(u16 n)
-{
-	early_write_u8(n);
-	early_write_u8(n >> 8);
-}
-
-EARLY_CODE u32 early_read_u32(void)
+u32 uart0_readl(void)
 {
 	u32 n;
-	n = early_read_u16();
-	n |= early_read_u16() << 16;
+	n = uart0_readw();
+	n |= uart0_readw() << 16;
 	return n;
 }
 
-EARLY_CODE void early_write_u32(u32 n)
+void uart0_writeb(u8 c)
 {
-	early_write_u16(n);
-	early_write_u16(n >> 16);
+	void __iomem *uart = (void __iomem *)UART0_BASE;
+	while (!(readw(uart + UART_TRSTATUS) & UART_TRSTATUS_TXEMPTY))
+		;
+	writeb(c, uart + UART_THB);
+}
+
+void uart0_writew(u16 n)
+{
+	uart0_writeb(n);
+	uart0_writeb(n >> 8);
+}
+
+void uart0_writel(u32 n)
+{
+	uart0_writew(n);
+	uart0_writew(n >> 16);
 }

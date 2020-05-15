@@ -18,32 +18,38 @@
 
 #include <asm/io.h>
 #include <asm/types.h>
-#include <mach/mcuy.h>
+#include <stdio.h> 
+#include <stdlib.h>
+#include <driver/uart.h>
 
-u32 get_ram_size(void)
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+
+static void a_task(void *pvParameters);
+static void b_task(void *pvParameters);
+
+int main(void)
 {
-	u32 memcfg = readl(MCUY_BASE + MCUY_CFG);
-	u32 ramsize = 8 << (memcfg & 0x3);
+    xTaskCreate(a_task, "a", 1024, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(b_task, "b", 1024, NULL, tskIDLE_PRIORITY + 1, NULL);
 
-	volatile u32 *low = (void *)((ramsize << 20) - 4);
-	volatile u32 *high = (void *)(((ramsize + 64) << 20) - 4);
+    vTaskStartScheduler();
 
-#if !defined(CONFIG_BAREMETAL_SHADOW)
-	(void *)low += 0x80000000;
-	(void *)high += 0x80000000;
-#endif
+    return 0;
+}
 
-	u32 old_low = *low;
-	u32 old_high = *high;
+static void a_task(void *pvParameters)
+{
+    while(1) {
+        uart0_writeb('a');
+        vTaskDelay(1000/configTICK_RATE_HZ);
+    }
+}
 
-	*low = 0x55AA55AA;
-	*high = 0xAA55AA55;
-
-	if (*low != 0xAA55AA55)
-		ramsize <<= 1;
-
-	*low = old_low;
-	*high = old_high;
-
-    return ramsize << 20;
+static void b_task(void *pvParameters)
+{
+    while(1) {
+        uart0_writeb('b');
+        vTaskDelay(1000/configTICK_RATE_HZ);
+    }
 }
