@@ -41,7 +41,7 @@ cflags-y += -mlittle-endian -msoft-float -mtune=arm9tdmi -march=armv5te -mthumb 
 ifdef CONFIG_DEBUG
   cflags-y += -O0 -g3 -DDEBUG
 else
-  cflags-y += -Os
+  cflags-y += -Os -g3
 endif
 
 # traverse directories for variables

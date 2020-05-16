@@ -1,0 +1,18 @@
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Build freertos_demo",
+            "command": "source ${workspaceFolder}/export.sh && make CONFIG_DEBUG=y",
+            "options": {
+                "cwd": "${workspaceFolder}/examples/freertos-demo"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ],
+    "version": "2.0.0"
+}

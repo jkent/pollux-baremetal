@@ -1,10 +1,10 @@
 /*
- * This is a derivative work of arch/arm/include/asm/io.h from the
- * Linux 3.9-rc6 kernel source.
+ * Copyright (C) 2020 Jeff Kent <jeff@jkent.net>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,33 +16,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __ASM_ARM_IO_H
-#define __ASM_ARM_IO_H
+#pragma once
 
 #include "asm/types.h"
 
-#define __raw_readb(a)         (*(volatile u8 __force *)(a))
-#define __raw_readw(a)         (*(volatile u16 __force *)(a))
-#define __raw_readl(a)         (*(volatile u32 __force *)(a))
-#define __raw_readq(a)         (*(volatile u64 __force *)(a))
+#define readb(a) (*(volatile u8 *)(a))
+#define readw(a) (*(volatile u16 *)(a))
+#define readl(a) (*(volatile u32 *)(a))
+#define readq(a) (*(volatile u64 *)(a))
 
-#define __raw_writeb(v,a)      ((void)(*(volatile u8 __force *)(a) = (v)))
-#define __raw_writew(v,a)      ((void)(*(volatile u16 __force *)(a) = (v)))
-#define __raw_writel(v,a)      ((void)(*(volatile u32 __force *)(a) = (v)))
-#define __raw_writeq(v,a)      ((void)(*(volatile u64 __force *)(a) = (v)))
-
-#define __iormb()
-#define __iowmb()
-
-#define readb(c)		({ u8  __v = __raw_readb(c); __iormb(); __v; })
-#define readw(c)		({ u16 __v = __raw_readw(c); __iormb(); __v; })
-#define readl(c)		({ u32 __v = __raw_readl(c); __iormb(); __v; })
-#define readq(c)		({ u64 __v = __raw_readq(c); __iormb(); __v; })
-
-#define writeb(v,c)		({ __iowmb(); __raw_writeb(v,c); })
-#define writew(v,c)		({ __iowmb(); __raw_writew(v,c); })
-#define writel(v,c)		({ __iowmb(); __raw_writel(v,c); })
-#define writeq(v,c)		({ __iowmb(); __raw_writeq(v,c); })
-
-#endif /* __ASM_ARM_IO_H */
-
+#define writeb(v, a) ((void)(*(volatile u8 *)(a) = (v)))
+#define writew(v, a) ((void)(*(volatile u16 *)(a) = (v)))
+#define writel(v, a) ((void)(*(volatile u32 *)(a) = (v)))
+#define writeq(v, a) ((void)(*(volatile u64 *)(a) = (v)))

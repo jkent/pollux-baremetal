@@ -1,2 +1,2 @@
-target := freertos_demo.bin
+target := freertos-demo.bin
 obj-y += main.o

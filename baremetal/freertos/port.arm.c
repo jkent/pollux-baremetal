@@ -198,9 +198,5 @@ static void prvSetupTimerInterrupt( void )
 
     /* run timer */
 	writel(readl(timer + TIMER_TMRCONTROL) | TIMER_RUN, timer + TIMER_TMRCONTROL);
-
-    asm("mrs r0, cpsr\n\t"
-        "bic r0, r0, #0xC0\n\t"
-        "msr cpsr, r0" ::: "r0");
 }
 /*-----------------------------------------------------------*/
