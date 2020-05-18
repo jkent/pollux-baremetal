@@ -28,8 +28,8 @@ extern int main(void);
 
 void startup(void)
 {
-#if defined(CONFIG_BAREMETAL_INTERRUPTS)
-	init_interrupts();
+#if defined(CONFIG_BAREMETAL_EXCEPTION)
+	init_exceptions();
 #endif
 
 #if defined(CONFIG_BAREMETAL_MMU)

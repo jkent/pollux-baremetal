@@ -36,7 +36,7 @@ LDFLAGS = -Wl,--gc-sections -Wl,-Map=$(BUILD)/$(basename $(target)).map
 LIBS     = -lgcc $(libs-y)
 INCLUDE  = -include $(BUILD)/config.h $(addprefix -I,$(BUILD) $(includes))
 
-cflags-y += -mlittle-endian -msoft-float -mtune=arm9tdmi -march=armv5te -mthumb -mthumb-interwork -nostartfiles
+cflags-y += -mlittle-endian -msoft-float -mtune=arm9tdmi -march=armv5te -marm -mthumb-interwork -nostartfiles
 
 ifdef CONFIG_DEBUG
   cflags-y += -O0 -g3 -DDEBUG
@@ -128,7 +128,7 @@ $$(BUILD)/%.arm.o: $(1)/%.arm.c | $$(DEPS)
 $$(BUILD)/%.thumb.o: $(1)/%.thumb.c | $$(DEPS)
 	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CC       $$<"
-	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(INCLUDE) $$< -o $$@
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -mthumb $$(INCLUDE) $$< -o $$@
 
 # .c -> .o
 $$(BUILD)/%.o: $(1)/%.c | $$(DEPS)
@@ -146,7 +146,7 @@ $$(BUILD)/%.o: $(1)/%.arm.c | $$(DEPS)
 $$(BUILD)/%.o: $(1)/%.thumb.c | $$(DEPS)
 	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CC       $$<"
-	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(INCLUDE) $$< -o $$@
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -mthumb $$(INCLUDE) $$< -o $$@
 
 # .arm.cpp -> .arm.o
 $$(BUILD)/%.arm.o: $(1)/%.arm.cpp | $$(DEPS)
@@ -158,7 +158,7 @@ $$(BUILD)/%.arm.o: $(1)/%.arm.cpp | $$(DEPS)
 $$(BUILD)/%.thumb.o: $(1)/%.thumb.cpp | $$(DEPS)
 	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CXX      $$<"
-	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -mthumb $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
 
 # .cpp -> .o
 $$(BUILD)/%.o: $(1)/%.cpp | $$(DEPS)
@@ -176,7 +176,7 @@ $$(BUILD)/%.o: $(1)/%.arm.cpp | $$(DEPS)
 $$(BUILD)/%.o: $(1)/%.thumb.cpp | $$(DEPS)
 	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CXX      $$<"
-	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
+	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -mthumb $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
 endef
 
 $(eval $(call generate_rules,$(BASEDIR)))

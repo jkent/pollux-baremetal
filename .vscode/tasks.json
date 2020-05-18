@@ -3,7 +3,8 @@
         {
             "type": "shell",
             "label": "Build freertos_demo",
-            "command": "source ${workspaceFolder}/export.sh && make CONFIG_DEBUG=y",
+            //"command": "source ${workspaceFolder}/export.sh && make CONFIG_DEBUG=y",
+            "command": "source ${workspaceFolder}/export.sh && make",
             "options": {
                 "cwd": "${workspaceFolder}/examples/freertos-demo"
             },

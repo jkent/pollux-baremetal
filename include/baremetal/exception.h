@@ -31,11 +31,7 @@
 
 typedef void (*irq_handler_t)(void);
 
-void init_interrupts(void);
-void interrupt_handler(u64 pending);
-void enable_interrupts(void);
-void disable_interrupts(void);
-
+void init_exceptions(void);
 void install_exc(u8 num, irq_handler_t handler);
 void install_irq(u8 num, irq_handler_t handler);
 void install_swi(u8 num, irq_handler_t handler);

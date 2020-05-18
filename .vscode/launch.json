@@ -14,7 +14,7 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "debugServerArgs": "-f \"${workspaceFolder}/tools/debug/tumpa.cfg\" -f \"${workspaceFolder}/tools/debug/pollux.cfg\"",
+            "debugServerArgs": "-f \"${workspaceFolder}/tools/debug/pollux.cfg\"",
             "serverLaunchTimeout": 20000,
             "filterStderr": true,
             "filterStdout": true,
@@ -26,8 +26,8 @@
                 { "text": "-interpreter-exec console \"monitor halt\"", "ignoreFailures": false },
                 { "text": "-interpreter-exec console \"monitor soft_reset_halt\"", "ignoreFailures": false },
                 //{ "text": "-interpreter-exec console \"monitor arm semihosting enable\"", "ignoreFailures": false },
-                //{ "text": "-target-download", "description": "load target", "ignoreFailures": false }
-                { "text": "-interpreter-exec console \"load\"", "ignoreFailures": false }
+                { "text": "-target-download", "description": "load target", "ignoreFailures": false }
+                //{ "text": "-interpreter-exec console \"load\"", "ignoreFailures": false }
             ],
             "logging": {
                 "moduleLoad": true,

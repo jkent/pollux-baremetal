@@ -34,16 +34,13 @@
 
 /* Standard includes. */
 #include <asm/io.h>
+#include <driver/uart.h>
 #include <mach/irq.h>
 #include <mach/timer.h>
 
 /* Scheduler includes. */
 #include "FreeRTOS.h"
 #include "task.h"
-
-/* Constants required to handle interrupts. */
-#define portTIMER_MATCH_ISR_BIT		( ( uint8_t ) 0x01 )
-#define portCLEAR_VIC_INTERRUPT		( ( uint32_t ) 0 )
 
 /* Constants required to handle critical sections. */
 #define portNO_CRITICAL_NESTING		( ( uint32_t ) 0 )
@@ -105,14 +102,19 @@ void vPortYieldProcessor( void )
 #if configUSE_PREEMPTION == 0
 
 	/* The cooperative scheduler requires a normal IRQ service routine to 
-	simply increment the system tick. */
-	void vNonPreemptiveTick( void ) __attribute__ ((interrupt ("FIQ")));
+	simply increment the system tick. *///
+	//void vNonPreemptiveTick( void ) __attribute__ ((interrupt ("IRQ")));
 	void vNonPreemptiveTick( void )
 	{	
-		//void __iomem *timer = (void __iomem *)TIMER0_BASE;
-		//writel(readl(timer + TIMER_TMRCONTROL) | TIMER_INTPEND, timer + TIMER_TMRCONTROL);
+		uart0_writeb('t');
 
 		xTaskIncrementTick();
+
+		void __iomem *timer = (void __iomem *)TIMER0_BASE;
+		writel(readl(timer + TIMER_TMRCONTROL) | TIMER_INTPEND, timer + TIMER_TMRCONTROL);
+
+		void __iomem *irq = (void __iomem *)IRQ_BASE;
+		writeq(readq(irq + IRQ_PENDL) | (1 << IRQ_TIMER0), irq + IRQ_PENDL);
 	}
 
 #else
@@ -136,11 +138,15 @@ void vPortYieldProcessor( void )
 			"SkipContextSwitch:			\t\n" ::: "r0"
 		);
 
+		uart0_writeb('t');
+
 		/* Ready for the next interrupt. */
 		void __iomem *timer = (void __iomem *)TIMER0_BASE;
 		writel(readl(timer + TIMER_TMRCONTROL) | TIMER_INTPEND, timer + TIMER_TMRCONTROL);	
+		
+		/* this should happen in the dispatcher */
 		void __iomem *irq = (void __iomem *)IRQ_BASE;
-		writeq(readq(irq + IRQ_PENDL) & ~(1 << IRQ_TIMER0), irq + IRQ_PENDL);
+		writel(readl(irq + IRQ_PENDL) | (1 << IRQ_TIMER0), irq + IRQ_PENDL);
 
 		/* Restore the context of the new task. */
 		portRESTORE_CONTEXT();

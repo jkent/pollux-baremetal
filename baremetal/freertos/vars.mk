@@ -4,7 +4,7 @@ obj-y += portISR.o
 ifeq ($(CONFIG_BAREMETAL_NEWLIB),)
 	obj-y += ../../freertos/portable/MemMang/heap_1.o
 else
-	obj-y += heap.o
+	obj-y += newlib_heap.o
 endif
 
 include-y += .

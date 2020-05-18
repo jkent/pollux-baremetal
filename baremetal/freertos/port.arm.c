@@ -87,7 +87,14 @@ StackType_t *pxOriginalTOS;
 	/* First on the stack is the return address - which in this case is the
 	start of the task.  The offset is added to make the return address appear
 	as it would within an IRQ ISR. */
-	*pxTopOfStack = ( StackType_t ) pxCode + portINSTRUCTION_SIZE;		
+	*pxTopOfStack = ( StackType_t ) pxCode + portINSTRUCTION_SIZE;
+#if 0
+	if( ( ( uint32_t ) pxCode & 0x01UL ) == 0x00 )
+	{
+		/* ARM alignment */
+		*pxTopOfStack += 2;
+	}
+#endif
 	pxTopOfStack--;
 
 	*pxTopOfStack = ( StackType_t ) 0x00000000;	/* R14 */
@@ -178,14 +185,15 @@ static void prvSetupTimerInterrupt( void )
 {
 	#if configUSE_PREEMPTION == 0
 		extern void ( vNonPreemptiveTick ) ( void );
-		install_exc(EXC_FIQ, vNonPreemptiveTick);
+		install_irq(IRQ_TIMER0, vNonPreemptiveTick);
 	#else
 		extern void ( vPreemptiveTick )( void );
-		install_exc(EXC_FIQ, vPreemptiveTick);
+		install_irq(IRQ_TIMER0, vPreemptiveTick);
 	#endif
 
     void __iomem *irq = (void __iomem *)IRQ_BASE;
-    writeq(readq(irq + IRQ_MODEL) | (1 << IRQ_TIMER0), irq + IRQ_MODEL);
+    writeq(readq(irq + IRQ_MODEL) & ~(1 << IRQ_TIMER0), irq + IRQ_MODEL);
+    writeq(readq(irq + IRQ_PENDL) | (1 << IRQ_TIMER0), irq + IRQ_PENDL);
     writeq(readq(irq + IRQ_MASKL) & ~(1 << IRQ_TIMER0), irq + IRQ_MASKL);
 
 	void __iomem *timer = (void __iomem *)TIMER0_BASE;
@@ -194,7 +202,7 @@ static void prvSetupTimerInterrupt( void )
 
 	writel((readl(timer + TIMER_TMRCONTROL) & ~TIMER_RUN) | TIMER_INTPEND | TIMER_INTENB | TIMER_SELTCLK(3), timer + TIMER_TMRCONTROL);
 	writel(0, timer + TIMER_TMRCOUNT);
-	writel(99999, timer + TIMER_TMRMATCH); /* 1000 Hz */
+	writel(99999, timer + TIMER_TMRMATCH); /* 10 Hz */
 
     /* run timer */
 	writel(readl(timer + TIMER_TMRCONTROL) | TIMER_RUN, timer + TIMER_TMRCONTROL);

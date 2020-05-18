@@ -26,32 +26,28 @@
 .global _entry
 _entry:
 	b _exc_reset
-	ldr pc, [pc, #24]
-	ldr pc, [pc, #24]
-	ldr pc, [pc, #24]
-	ldr pc, [pc, #24]
-	ldr pc, [pc, #24]
-	ldr pc, [pc, #24]
-	ldr pc, [pc, #24]
-	ldr pc, [pc, #24]
+	b .
+	b .
+	b .
+	b .
+	b .
+	b .
+	b .
 
 _vectors:
 .word _exc_reset
-.word _exc_unset
-.word _exc_unset
-.word _exc_unset
-.word _exc_unset
-.word _exc_unset
-.word _exc_unset
-.word _exc_unset
-
-_exc_unset:
-	msr cpsr_c, #0xD3 /* switch to svc mode, with FIQ/IRQ disabled */
+.word 0
+.word 0
+.word 0
+.word 0
+.word 0
+.word 0
+.word 0
 
 _exc_reset:
 
 /* setup stack */
-#if defined(CONFIG_BAREMETAL_INTERRUPTS)
+#if defined(CONFIG_BAREMETAL_EXCEPTION)
 	ldr r0, =_stack_top - CONFIG_BAREMETAL_FIQ_STACK_SIZE - \
 		CONFIG_BAREMETAL_IRQ_STACK_SIZE - CONFIG_BAREMETAL_ABT_STACK_SIZE - \
 		CONFIG_BAREMETAL_UND_STACK_SIZE
