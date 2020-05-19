@@ -2,17 +2,24 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "Build freertos_demo",
-            //"command": "source ${workspaceFolder}/export.sh && make CONFIG_DEBUG=y",
-            "command": "source ${workspaceFolder}/export.sh && make",
+            "label": "build freertos-demo",
+            "command": "export PATH=\"/opt/x-tools/arm-none-eabi/bin:$PATH\" && source ${workspaceFolder}/export.sh && make CONFIG_DEBUG=y",
             "options": {
                 "cwd": "${workspaceFolder}/examples/freertos-demo"
             },
-            "problemMatcher": [],
             "group": {
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "type": "shell",
+            "label": "clean freertos-demo",
+            "command": "source ${workspaceFolder}/export.sh && make clean",
+            "options": {
+                "cwd": "${workspaceFolder}/examples/freertos-demo"
+            },
+            "problemMatcher": []
         }
     ],
     "version": "2.0.0"
