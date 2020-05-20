@@ -12,9 +12,10 @@
             "device": "ARM9",
             "interface": "jtag",
             "rtos": "FreeRTOS",
-            "executable": "build/freertos-demo.elf",
-            "cwd": "${workspaceFolder}/examples/freertos-demo",
-            "preLaunchTask": "debug freertos-demo"
+            "executable": "examples/freertos-demo/build/freertos-demo.elf",
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "debug freertos-demo",
+            "svdFile": "tools/pollux.svd"
         }
     ]
 }

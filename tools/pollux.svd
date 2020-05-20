@@ -1,0 +1,2142 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  Copyright (C) 2020 Jeff Kent <jeff@jkent.net>
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are met:
+
+  1. Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
+
+  2. Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+  3. Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from this
+  software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  POSSIBILITY OF SUCH DAMAGE.
+ -->
+
+<device schemaVersion="1.1" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="CMSIS-SVD.xsd" >
+  <vendor>MagicEyes Digital, Inc.</vendor>
+  <vendorID>MagicEyes</vendorID>
+  <name>LF1000</name>
+  <series>POLLUX</series>
+  <version>1.2</version>
+  <description>ARM 32-bit ARM9 Application processor clocked up to 533 MHz</description>
+  <licenseText>
+    Copyright (C) 2020 Jeff Kent &lt;jeff@jkent.net&gt;\n
+    \n
+    Redistribution and use in source and binary forms, with or without\n
+    modification, are permitted provided that the following conditions are met:\n
+    \n
+    1. Redistributions of source code must retain the above copyright notice,\n
+    this list of conditions and the following disclaimer.\n
+    \n
+    2. Redistributions in binary form must reproduce the above copyright notice,\n
+    this list of conditions and the following disclaimer in the documentation\n
+    and/or other materials provided with the distribution.\n
+    \n
+    3. Neither the name of the copyright holder nor the names of its\n
+    contributors may be used to endorse or promote products derived from this\n
+    software without specific prior written permission.\n
+    \n
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"\n
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE\n
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n
+    POSSIBILITY OF SUCH DAMAGE.
+  </licenseText>
+  <cpu>
+    <name>other</name>
+    <revision>r5p0</revision>
+    <endian>little</endian>
+    <mpuPresent>true</mpuPresent>
+    <fpuPresent>false</fpuPresent>
+    <icachePresent>true</icachePresent>
+    <dcachePresent>true</dcachePresent>
+    <dtcmPresent>true</dtcmPresent>
+    <itcmPresent>true</itcmPresent>
+    <vtorPresent>false</vtorPresent>
+    <nvicPrioBits>0</nvicPrioBits>
+  </cpu>
+  <addressUnitBits>8</addressUnitBits>
+  <width>32</width>
+
+  <!-- Default register values -->
+  <size>32</size>
+  <access>read-write</access>
+  <resetValue>0x00000000</resetValue>
+  <resetMask>0xFFFFFFFF</resetMask>
+
+  <peripherals>
+    <peripheral>
+      <name>INTCON</name>
+      <version>1.0</version>
+      <description>Interrupt controller</description>
+      <baseAddress>0xC0000800</baseAddress>
+      <size>32</size>
+      <access>read-write</access>
+
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x80</size>
+        <usage>registers</usage>
+      </addressBlock>
+
+      <registers>
+        <register>
+          <name>INTMODEL</name>
+          <description>Interrupt mode low register</description>
+          <addressOffset>0x08</addressOffset>
+
+          <fields>
+            <field>
+              <name>PDISPLAY</name>
+              <description>Primary display IRQ/FIQ flag</description>
+              <bitRange>[0:0]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SDISPLAY</name>
+              <description>Secondary display IRQ/FIQ flag</description>
+              <bitRange>[1:1]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>DMA</name>
+              <description>DMA controller IRQ/FIQ flag</description>
+              <bitRange>[3:3]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>TIMER0</name>
+              <description>Timer 0 IRQ/FIQ flag</description>
+              <bitRange>[4:4]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SYSCTRL</name>
+              <description>System control IRQ/FIQ flag</description>
+              <bitRange>[5:5]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UART0</name>
+              <description>UART 0 IRQ/FIQ flag</description>
+              <bitRange>[10:10]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>TIMER1</name>
+              <description>Timer 1 IRQ/FIQ flag</description>
+              <bitRange>[11:11]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SSPSPI0</name>
+              <description>SSPSPI 0 IRQ/FIQ flag</description>
+              <bitRange>[12:12]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>GPIO</name>
+              <description>GPIO IRQ/FIQ flag</description>
+              <bitRange>[13:13]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SDMMC</name>
+              <description>SDMMC IRQ/FIQ flag</description>
+              <bitRange>[14:14]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>TIMER2</name>
+              <description>Timer 2 IRQ/FIQ flag</description>
+              <bitRange>[15:15]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UDC</name>
+              <description>USB Device Controller IRQ/FIQ flag</description>
+              <bitRange>[20:20]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>TIMER3</name>
+              <description>Timer 3 IRQ/FIQ flag</description>
+              <bitRange>[21:21]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>AUDIOIF</name>
+              <description>Audio Interface IRQ/FIQ flag</description>
+              <bitRange>[24:24]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>ADC</name>
+              <description>ADC IRQ/FIQ flag</description>
+              <bitRange>[25:25]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>MCUSTATIC</name>
+              <description>MCU-S bus IRQ/FIQ flag</description>
+              <bitRange>[26:26]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>GRP3D</name>
+              <description>3D graphics IRQ/FIQ flag</description>
+              <bitRange>[27:27]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UHC</name>
+              <description>USB host controller IRQ/FIQ flag</description>
+              <bitRange>[28:28]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>RTC</name>
+              <description>RTC IRQ/FIQ flag</description>
+              <bitRange>[31:31]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+          </fields>
+        </register>
+
+        <register>
+          <name>INTMODH</name>
+          <description>Interrupt mode high register</description>
+          <addressOffset>0x0C</addressOffset>
+
+          <fields>
+            <field>
+              <name>I2C0</name>
+              <description>I2C 0</description>
+              <bitRange>[0:0]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>I2C1</name>
+              <description>I2C 1 IRQ/FIQ flag</description>
+              <bitRange>[1:1]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UART1</name>
+              <description>UART 1 IRQ/FIQ flag</description>
+              <bitRange>[2:2]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UART2</name>
+              <description>UART 2 IRQ/FIQ flag</description>
+              <bitRange>[3:3]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UART3</name>
+              <description>UART 3 IRQ/FIQ flag</description>
+              <bitRange>[4:4]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SSPSPI1</name>
+              <description>SSPSPI 1 IRQ/FIQ flag</description>
+              <bitRange>[7:7]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SSPSPI2</name>
+              <description>SSPSPI 2 IRQ/FIQ flag</description>
+              <bitRange>[8:8]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>CSC</name>
+              <description>CSC IRQ/FIQ flag</description>
+              <bitRange>[9:9]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SDMMC1</name>
+              <description>SDMMC 1 IRQ/FIQ flag</description>
+              <bitRange>[10:10]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>TIMER4</name>
+              <description>Timer 4 IRQ/FIQ flag</description>
+              <bitRange>[11:11]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>IRQ</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>FIQ</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+          </fields>
+        </register>
+
+        <register>
+          <name>INTMASKL</name>
+          <description>Interrupt mask low register</description>
+          <addressOffset>0x10</addressOffset>
+
+          <fields>
+            <field>
+              <name>PDISPLAY</name>
+              <description>Primary display mask flag</description>
+              <bitRange>[0:0]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SDISPLAY</name>
+              <description>Secondary display mask flag</description>
+              <bitRange>[1:1]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>DMA</name>
+              <description>DMA controller mask flag</description>
+              <bitRange>[3:3]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>TIMER0</name>
+              <description>Timer 0 mask flag</description>
+              <bitRange>[4:4]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SYSCTRL</name>
+              <description>System control mask flag</description>
+              <bitRange>[5:5]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UART0</name>
+              <description>UART 0 mask flag</description>
+              <bitRange>[10:10]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>TIMER1</name>
+              <description>Timer 1 mask flag</description>
+              <bitRange>[11:11]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SSPSPI0</name>
+              <description>SSPSPI 0 mask flag</description>
+              <bitRange>[12:12]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>GPIO</name>
+              <description>GPIO mask flag</description>
+              <bitRange>[13:13]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SDMMC</name>
+              <description>SDMMC mask flag</description>
+              <bitRange>[14:14]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>TIMER2</name>
+              <description>Timer 2 mask flag</description>
+              <bitRange>[15:15]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UDC</name>
+              <description>USB Device Controller mask flag</description>
+              <bitRange>[20:20]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>TIMER3</name>
+              <description>Timer 3 mask flag</description>
+              <bitRange>[21:21]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>AUDIOIF</name>
+              <description>Audio Interface mask flag</description>
+              <bitRange>[24:24]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>ADC</name>
+              <description>ADC mask flag</description>
+              <bitRange>[25:25]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>MCUSTATIC</name>
+              <description>MCU-S bus mask flag</description>
+              <bitRange>[26:26]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>GRP3D</name>
+              <description>3D graphics mask flag</description>
+              <bitRange>[27:27]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UHC</name>
+              <description>USB host controller mask flag</description>
+              <bitRange>[28:28]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>RTC</name>
+              <description>RTC mask flag</description>
+              <bitRange>[31:31]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+          </fields>
+        </register>
+
+        <register>
+          <name>INTMASKH</name>
+          <description>Interrupt mask high register</description>
+          <addressOffset>0x14</addressOffset>
+
+          <fields>
+            <field>
+              <name>I2C0</name>
+              <description>I2C 0</description>
+              <bitRange>[0:0]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>I2C1</name>
+              <description>I2C 1 mask flag</description>
+              <bitRange>[1:1]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UART1</name>
+              <description>UART 1 mask flag</description>
+              <bitRange>[2:2]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UART2</name>
+              <description>UART 2 mask flag</description>
+              <bitRange>[3:3]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UART3</name>
+              <description>UART 3 mask flag</description>
+              <bitRange>[4:4]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SSPSPI1</name>
+              <description>SSPSPI 1 mask flag</description>
+              <bitRange>[7:7]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SSPSPI2</name>
+              <description>SSPSPI 2 mask flag</description>
+              <bitRange>[8:8]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>CSC</name>
+              <description>CSC mask flag</description>
+              <bitRange>[9:9]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SDMMC1</name>
+              <description>SDMMC 1 mask flag</description>
+              <bitRange>[10:10]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>TIMER4</name>
+              <description>Timer 4 mask flag</description>
+              <bitRange>[11:11]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Serviced</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Masked</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+          </fields>
+        </register>
+
+        <register>
+          <name>PRIORDER</name>
+          <description>Interrupt priority order register</description>
+          <addressOffset>0x18</addressOffset>
+
+          <fields>
+            <field>
+              <name>ARBSEL0</name>
+              <description>Arbiter group 0 priority order set</description>
+              <bitRange>[1:0]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>REQ 0-1-2-3-4-5</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-2-3-4-1-5</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-3-4-1-2-5</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-4-1-2-3-5</name>
+                  <value>3</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>ARBSEL1</name>
+              <description>Arbiter group 1 priority order set</description>
+              <bitRange>[3:2]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>REQ 0-1-2-3-4-5</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-2-3-4-1-5</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-3-4-1-2-5</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-4-1-2-3-5</name>
+                  <value>3</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>ARBSEL2</name>
+              <description>Arbiter group 2 priority order set</description>
+              <bitRange>[5:4]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>REQ 0-1-2-3-4-5</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-2-3-4-1-5</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-3-4-1-2-5</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-4-1-2-3-5</name>
+                  <value>3</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>ARBSEL3</name>
+              <description>Arbiter group 3 priority order set</description>
+              <bitRange>[7:6]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>REQ 0-1-2-3-4-5</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-2-3-4-1-5</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-3-4-1-2-5</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-4-1-2-3-5</name>
+                  <value>3</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+
+            <field>
+              <name>ARBSEL4</name>
+              <description>Arbiter group 4 priority order set</description>
+              <bitRange>[9:8]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>REQ 0-1-2-3-4-5</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-2-3-4-1-5</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-3-4-1-2-5</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-4-1-2-3-5</name>
+                  <value>3</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>ARBSEL5</name>
+              <description>Arbiter group 5 priority order set</description>
+              <bitRange>[11:10]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>REQ 0-1-2-3-4-5</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-2-3-4-1-5</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-3-4-1-2-5</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-4-1-2-3-5</name>
+                  <value>3</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>ARBSEL6</name>
+              <description>Arbiter group 6 priority order set</description>
+              <bitRange>[13:12]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>REQ 0-1-2-3-4-5</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-2-3-4-1-5</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-3-4-1-2-5</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-4-1-2-3-5</name>
+                  <value>3</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>ARBSEL7</name>
+              <description>Arbiter group 7 priority order set</description>
+              <bitRange>[15:14]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>REQ 0-1-2-3-4-5</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-2-3-4-1-5</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-3-4-1-2-5</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-4-1-2-3-5</name>
+                  <value>3</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>ARBSEL8</name>
+              <description>Arbiter group 8 priority order set</description>
+              <bitRange>[17:16]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>REQ 0-1-2-3-4-5</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-2-3-4-1-5</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-3-4-1-2-5</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-4-1-2-3-5</name>
+                  <value>3</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>ARBSEL9</name>
+              <description>Arbiter group 9 priority order set</description>
+              <bitRange>[19:18]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>REQ 0-1-2-3-4-5</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-2-3-4-1-5</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-3-4-1-2-5</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-4-1-2-3-5</name>
+                  <value>3</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>ARBSEL10</name>
+              <description>Arbiter group 10 priority order set</description>
+              <bitRange>[21:20]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>REQ 0-1-2-3-4-5</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-2-3-4-1-5</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-3-4-1-2-5</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-4-1-2-3-5</name>
+                  <value>3</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>ARBSEL11</name>
+              <description>Arbiter group 11 priority order set</description>
+              <bitRange>[24:22]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>REQ 0-1-2-3-4-5-6-7-8-9-10</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-2-3-4-5-6-7-8-1-9-10</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-3-4-5-6-7-8-1-2-9-10</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-4-5-6-7-8-1-2-3-9-10</name>
+                  <value>3</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-5-6-7-8-1-2-3-4-9-10</name>
+                  <value>4</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-6-7-8-1-2-3-4-5-9-10</name>
+                  <value>5</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-7-8-1-2-3-4-5-6-9-10</name>
+                  <value>6</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>REQ 0-8-1-2-3-4-5-6-7-9-10</name>
+                  <value>7</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+          </fields>
+        </register>
+
+        <register>
+          <name>INTPENDL</name>
+          <description>Interrupt pending low register</description>
+          <addressOffset>0x20</addressOffset>
+
+          <fields>
+            <field>
+              <name>PDISPLAY</name>
+              <description>Primary display pending flag</description>
+              <bitRange>[0:0]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SDISPLAY</name>
+              <description>Secondary display pending flag</description>
+              <bitRange>[1:1]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>DMA</name>
+              <description>DMA controller pending flag</description>
+              <bitRange>[3:3]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>TIMER0</name>
+              <description>Timer 0 pending flag</description>
+              <bitRange>[4:4]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SYSCTRL</name>
+              <description>System control pending flag</description>
+              <bitRange>[5:5]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UART0</name>
+              <description>UART 0 pending flag</description>
+              <bitRange>[10:10]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>TIMER1</name>
+              <description>Timer 1 pending flag</description>
+              <bitRange>[11:11]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SSPSPI0</name>
+              <description>SSPSPI 0 pending flag</description>
+              <bitRange>[12:12]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>GPIO</name>
+              <description>GPIO pending flag</description>
+              <bitRange>[13:13]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SDMMC</name>
+              <description>SDMMC pending flag</description>
+              <bitRange>[14:14]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>TIMER2</name>
+              <description>Timer 2 pending flag</description>
+              <bitRange>[15:15]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UDC</name>
+              <description>USB Device Controller pending flag</description>
+              <bitRange>[20:20]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>TIMER3</name>
+              <description>Timer 3 pending flag</description>
+              <bitRange>[21:21]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>AUDIOIF</name>
+              <description>Audio Interface pending flag</description>
+              <bitRange>[24:24]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>ADC</name>
+              <description>ADC pending flag</description>
+              <bitRange>[25:25]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>MCUSTATIC</name>
+              <description>MCU-S bus pending flag</description>
+              <bitRange>[26:26]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>GRP3D</name>
+              <description>3D graphics pending flag</description>
+              <bitRange>[27:27]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UHC</name>
+              <description>USB host controller pending flag</description>
+              <bitRange>[28:28]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>RTC</name>
+              <description>RTC pending flag</description>
+              <bitRange>[31:31]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+          </fields>
+        </register>
+
+        <register>
+          <name>INTPENDH</name>
+          <description>Interrupt pending high register</description>
+          <addressOffset>0x24</addressOffset>
+
+          <fields>
+            <field>
+              <name>I2C0</name>
+              <description>I2C 0</description>
+              <bitRange>[0:0]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>I2C1</name>
+              <description>I2C 1 pending flag</description>
+              <bitRange>[1:1]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UART1</name>
+              <description>UART 1 pending flag</description>
+              <bitRange>[2:2]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UART2</name>
+              <description>UART 2 pending flag</description>
+              <bitRange>[3:3]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>UART3</name>
+              <description>UART 3 pending flag</description>
+              <bitRange>[4:4]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SSPSPI1</name>
+              <description>SSPSPI 1 pending flag</description>
+              <bitRange>[7:7]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SSPSPI2</name>
+              <description>SSPSPI 2 pending flag</description>
+              <bitRange>[8:8]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>CSC</name>
+              <description>CSC pending flag</description>
+              <bitRange>[9:9]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>SDMMC1</name>
+              <description>SDMMC 1 pending flag</description>
+              <bitRange>[10:10]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>TIMER4</name>
+              <description>Timer 4 pending flag</description>
+              <bitRange>[11:11]</bitRange>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+          </fields>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>TIMER0</name>
+      <version>1.0</version>
+      <description>32-bit timer/up counter with auto-reload</description>
+      <groupName>TIMER</groupName>
+      <baseAddress>0xC0001800</baseAddress>
+      <size>32</size>
+      <access>read-write</access>
+
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x80</size>
+        <usage>registers</usage>
+      </addressBlock>
+
+      <interrupt>
+        <name>TIMER0</name>
+        <description>Timer 0 interrupt</description>
+        <value>4</value>
+      </interrupt>
+
+      <registers>
+        <register>
+          <name>COUNT</name>
+          <description>Count register</description>
+          <addressOffset>0x00</addressOffset>
+          <access>read-write</access>
+        </register>
+
+        <register>
+          <name>MATCH</name>
+          <description>Match Register</description>
+          <addressOffset>0x04</addressOffset>
+          <access>read-write</access>
+        </register>
+
+        <register>
+          <name>CONTROL</name>
+          <description>Control Register</description>
+          <addressOffset>0x8</addressOffset>
+          <access>read-write</access>
+          <resetMask>0x0000007F</resetMask>
+
+          <fields>
+            <field>
+              <name>SELTCLK</name>
+              <description>Timer clock select</description>
+              <bitRange>[1:0]</bitRange>
+              <access>read-write</access>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>/2</name>
+                  <description>Timer clock / 2</description>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>/4</name>
+                  <description>Timer clock / 4</description>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>/8</name>
+                  <description>Timer clock / 8</description>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>/1</name>
+                  <description>Timer clock / 1</description>
+                  <value>3</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>WDENB</name>
+              <description>Watchdog enable</description>
+              <bitRange>[2:2]</bitRange>
+              <access>read-write</access>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Disabled</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Enabled</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>RUN</name>
+              <description>Timer stop/run</description>
+              <bitRange>[2:2]</bitRange>
+              <access>read-write</access>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Stop</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Run</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>INTENB</name>
+              <description>Interrupt enable</description>
+              <bitRange>[4:4]</bitRange>
+              <access>read-write</access>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Disabled</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Enabled</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>INTPEND</name>
+              <description>Interrupt pending</description>
+              <bitRange>[5:5]</bitRange>
+              <access>read-write</access>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Not pending</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Pending</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>LDCNT</name>
+              <description>Updates the COUNT register for reading</description>
+              <bitRange>[6:6]</bitRange>
+              <access>write</access>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Nop</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Load</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+          </fields>
+        </register>
+
+        <register>
+          <name>CLKENB</name>
+          <description>Timer clock generation enable</description>
+          <addressOffset>0x40</addressOffset>
+          <access>read-write</access>
+          <resetMask>0x0000000C</resetMask>
+
+          <fields>
+            <field>
+              <name>TCLKMODE</name>
+              <description>Determines the TCLK operation mode</description>
+              <bitRange>[3:3]</bitRange>
+              <access>read-write</access>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Only on cpu access</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Always</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+
+            <field>
+              <name>CLKGENENB</name>
+              <description>Enables/disables clock generation</description>
+              <bitRange>[2:2]</bitRange>
+              <access>read-write</access>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>Disable</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>Enable</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+          </fields>
+        </register>
+
+        <register>
+          <name>CLKGEN</name>
+          <description>Timer clock generation control</description>
+          <addressOffset>0x44</addressOffset>
+          <access>read-write</access>
+          <resetMask>0x00000FFE</resetMask>
+
+          <fields>
+            <field>
+              <name>CLKDIV</name>
+              <description>Clock divider</description>
+              <bitRange>[11:4]</bitRange>
+              <access>read-write</access>
+            </field>
+
+            <field>
+              <name>CLKSRCSEL</name>
+              <description>Clock source selection</description>
+              <bitRange>[3:1]</bitRange>
+              <access>read-write</access>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>PLL0</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>PLL1</name>
+                  <value>1</value>
+                </enumeratedValue>
+              </enumeratedValues>
+            </field>
+          </fields>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral derivedFrom="TIMER0">
+      <name>TIMER1</name>
+      <baseAddress>0xC0001880</baseAddress>
+      <interrupt>
+        <name>TIMER1</name>
+        <description>Timer 1 interrupt</description>
+        <value>11</value>
+      </interrupt>
+    </peripheral>
+
+    <peripheral derivedFrom="TIMER0">
+      <name>TIMER2</name>
+      <baseAddress>0xC0001900</baseAddress>
+      <interrupt>
+        <name>TIMER2</name>
+        <description>Timer 2 interrupt</description>
+        <value>15</value>
+      </interrupt>
+    </peripheral>
+
+    <peripheral derivedFrom="TIMER0">
+      <name>TIMER3</name>
+      <baseAddress>0xC0001980</baseAddress>
+      <interrupt>
+        <name>TIMER2</name>
+        <description>Timer 3 interrupt</description>
+        <value>21</value>
+      </interrupt>
+    </peripheral>
+
+    <peripheral derivedFrom="TIMER0">
+      <name>TIMER4</name>
+      <baseAddress>0xC0001A00</baseAddress>
+      <interrupt>
+        <name>TIMER4</name>
+        <description>Timer 4 interrupt</description>
+        <value>43</value>
+      </interrupt>
+    </peripheral>
+  </peripherals>
+</device>
