@@ -5,17 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "openocd - freertos-demo",
+            "name": "jlink - freertos-demo",
             "type": "cortex-debug",
             "request": "launch",
-            "servertype": "openocd",
-            "executable": "examples/freertos-demo/build/freertos-demo.elf",
-            "cwd": "${workspaceFolder}",
-            "preLaunchTask": "build freertos-demo",
-            "configFiles": [
-                "interface/ftdi/tumpa.cfg",
-                "tools/pollux.cfg",
-            ]
+            "servertype": "jlink",
+            "device": "ARM9",
+            "interface": "jtag",
+            "rtos": "FreeRTOS",
+            "executable": "build/freertos-demo.elf",
+            "cwd": "${workspaceFolder}/examples/freertos-demo",
+            "preLaunchTask": "debug freertos-demo"
         }
     ]
 }

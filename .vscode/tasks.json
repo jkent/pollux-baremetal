@@ -20,6 +20,19 @@
                 "cwd": "${workspaceFolder}/examples/freertos-demo"
             },
             "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "reset target",
+            "command": "${workspaceFolder}/tools/reset.py",
+            "problemMatcher": []
+        },
+        {
+            "label": "debug freertos-demo",
+            "dependsOn": [
+                "build freertos-demo",
+                "reset target",
+            ]
         }
     ],
     "version": "2.0.0"

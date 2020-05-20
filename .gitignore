@@ -1,1 +1,4 @@
+.vscode/.cortex-debug.*
+*.pyc
+core
 micromon.cfg
