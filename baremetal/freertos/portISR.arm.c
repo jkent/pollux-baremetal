@@ -106,7 +106,7 @@ void vPortYieldProcessor( void )
 	//void vNonPreemptiveTick( void ) __attribute__ ((interrupt ("IRQ")));
 	void vNonPreemptiveTick( void )
 	{	
-		uart0_writeb('t');
+		//uart0_writeb('t');
 
 		xTaskIncrementTick();
 

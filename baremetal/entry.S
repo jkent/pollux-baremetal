@@ -25,24 +25,32 @@
 
 .global _entry
 _entry:
-	b _exc_reset
-	b .
-	b .
-	b .
-	b .
-	b .
-	b .
-	b .
+_vect_reset:
+	ldr pc, [pc, #24]
+_vect_undef:
+	ldr pc, [pc, #24]
+_vect_swi:
+	ldr pc, [pc, #24]
+_vect_pabort:
+	ldr pc, [pc, #24]
+_vect_dabort:
+	ldr pc, [pc, #24]
+_vect_reserved:
+	ldr pc, [pc, #24]
+_vect_irq:
+	ldr pc, [pc, #24]
+_vect_fiq:
+	ldr pc, [pc, #24]
 
 _vectors:
 .word _exc_reset
-.word 0
-.word 0
-.word 0
-.word 0
-.word 0
-.word 0
-.word 0
+.word _vect_undef
+.word _vect_swi
+.word _vect_pabort
+.word _vect_dabort
+.word _vect_reserved
+.word _vect_irq
+.word _vect_fiq
 
 _exc_reset:
 

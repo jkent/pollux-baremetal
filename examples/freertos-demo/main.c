@@ -19,23 +19,23 @@
 #include <asm/io.h>
 #include <asm/types.h>
 #include <driver/uart.h>
-#include <stdio.h> 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-static void a_task(void *pvParameters);
-static void b_task(void *pvParameters);
+static void task_a(void *pvParameters);
+static void task_b(void *pvParameters);
 
 int main(void)
 {
     //puts("Creating tasks");
     uart0_writeb('1');
 
-    BaseType_t result = xTaskCreate(a_task, "a", 1024, NULL, tskIDLE_PRIORITY + 1, NULL);
+    BaseType_t result = xTaskCreate(task_a, "a task", 1024, (void *)'a', tskIDLE_PRIORITY + 1, NULL);
     uart0_writeb(result == pdPASS ? '+' : '-');
-    result = xTaskCreate(b_task, "b", 1024, NULL, tskIDLE_PRIORITY + 1, NULL);
+    result = xTaskCreate(task_b, "b task", 1024, (void *)'b', tskIDLE_PRIORITY + 1, NULL);
     uart0_writeb(result == pdPASS ? '+' : '-');
 
     //puts("Starting scheduler");
@@ -46,7 +46,7 @@ int main(void)
     return 0;
 }
 
-static void a_task(void *pvParameters)
+static void task_a(void *pvParameters)
 {
     while(1) {
         uart0_writeb('a');
@@ -54,11 +54,10 @@ static void a_task(void *pvParameters)
     }
 }
 
-static void b_task(void *pvParameters)
+static void task_b(void *pvParameters)
 {
     while(1) {
         uart0_writeb('b');
-        //portYIELD();
         vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }

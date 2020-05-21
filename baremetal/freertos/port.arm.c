@@ -88,13 +88,6 @@ StackType_t *pxOriginalTOS;
 	start of the task.  The offset is added to make the return address appear
 	as it would within an IRQ ISR. */
 	*pxTopOfStack = ( StackType_t ) pxCode + portINSTRUCTION_SIZE;
-#if 0
-	if( ( ( uint32_t ) pxCode & 0x01UL ) == 0x00 )
-	{
-		/* ARM alignment */
-		*pxTopOfStack += 2;
-	}
-#endif
 	pxTopOfStack--;
 
 	*pxTopOfStack = ( StackType_t ) 0x00000000;	/* R14 */
@@ -164,7 +157,7 @@ BaseType_t xPortStartScheduler( void )
 	prvSetupTimerInterrupt();
 
 	/* Start the first task. */
-	vPortISRStartFirstTask();	
+	vPortISRStartFirstTask();
 
 	/* Should not get here! */
 	return 0;

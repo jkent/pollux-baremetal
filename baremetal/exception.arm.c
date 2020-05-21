@@ -77,7 +77,6 @@ void irq_handler(void)
 	if (irq_table[n] != NULL) {
 		irq_table[n]();
 	}
-	uart0_writeb(' ' + n);
 	writeq(pending, irq + IRQ_PENDL);
 }
 
@@ -112,10 +111,12 @@ void init_exceptions(void)
 
 	exc_base = (void *)&_exc_phys;
 #endif
-	for (u32* p = exc_base; p < (u32 *)(exc_base + 0x20); p++) {
-		*p = 0xE59FF018; /* ldr pc, [pc, #24] */
-	}
 	exc_table = (irq_handler_t *)(exc_base + 0x20);
+	for (int i = 0; i < 8; i++) {
+		u32 *vect = (u32 *)exc_base + i;
+		*vect = 0xE59FF018; /* ldr pc, [pc, #24] */
+		*((u32 *)(exc_table) + i) = (u32)vect;
+	}
 
 	install_exc(EXC_SWI, swi_handler);
 	install_exc(EXC_PREFETCH_ABORT, pabort_handler);

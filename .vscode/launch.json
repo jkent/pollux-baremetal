@@ -16,6 +16,20 @@
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "debug freertos-demo",
             "svdFile": "tools/pollux.svd"
+        },
+        {
+            "name": "openocd - freertos-demo",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "executable": "examples/freertos-demo/build/freertos-demo.elf",
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "debug freertos-demo",
+            "svdFile": "tools/pollux.svd",
+            "configFiles": [
+                "interface/jlink.cfg",
+                "tools/openocd.cfg"
+            ]
         }
     ]
 }

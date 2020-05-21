@@ -59,6 +59,8 @@
 #define configUSE_NEWLIB_REENTRANT  1
 #endif
 
+#define configASSERT(_x)     if( ( _x ) == 0 ) { taskDISABLE_INTERRUPTS(); asm("bkpt"); for( ;; ); }
+
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES 		0
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
