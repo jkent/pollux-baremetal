@@ -128,7 +128,10 @@ SECTIONS
 #endif
 }
 
-#if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) || defined(BAREMETAL_BOOT_SOURCE_NAND)
+#if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART)
 ASSERT(SIZEOF(.entry) + SIZEOF(.entry_thumb) <= 512,
-        "Entry code does not fit within 512 bytes")
+  "Entry code does not fit within 512 bytes")
+#elif defined(CONFIG_BAREMETAL_BOOT_SOURCE_NAND)
+ASSERT(SIZEOF(.entry) + SIZEOF(.entry_thumb) <= CONFIG_BAREMETAL_NAND_PAGE_SIZE,
+  "Entry code does not fit within " #CONFIG_BAREMETAL_NAND_PAGE_SIZE " bytes")
 #endif

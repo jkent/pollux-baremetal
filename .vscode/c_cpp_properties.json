@@ -3,7 +3,7 @@
         {
             "name": "Linux arm-none-eabi",
             "includePath": [
-                "${workspaceFolder}/**",
+		"${workspaceFolder}/include",
                 "${workspaceFolder}/baremetal/freertos"
             ],
             "defines": [],
