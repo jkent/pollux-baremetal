@@ -1,5 +1,5 @@
 obj-y += port.o
-obj-y += portISR.o
+obj-y += portasm.o
 
 ifeq ($(CONFIG_BAREMETAL_NEWLIB),)
 	obj-y += ../../freertos/portable/MemMang/heap_1.o

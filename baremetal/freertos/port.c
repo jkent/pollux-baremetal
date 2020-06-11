@@ -59,9 +59,9 @@ static void prvSetupTimerInterrupt( void );
 
 /* 
  * The scheduler can only be started from ARM mode, so 
- * vPortISRStartFirstSTask() is defined in portISR.c. 
+ * vPortStartFirstSTask() is defined in portISR.c. 
  */
-extern void vPortISRStartFirstTask( void );
+extern void vPortStartFirstTask( void );
 
 /*-----------------------------------------------------------*/
 
@@ -73,7 +73,7 @@ extern void vPortISRStartFirstTask( void );
  */
 StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters )
 {
-StackType_t *pxOriginalTOS;
+	StackType_t *pxOriginalTOS;
 
 	pxOriginalTOS = pxTopOfStack;
 	
@@ -90,7 +90,7 @@ StackType_t *pxOriginalTOS;
 	*pxTopOfStack = ( StackType_t ) pxCode + portINSTRUCTION_SIZE;
 	pxTopOfStack--;
 
-	*pxTopOfStack = ( StackType_t ) 0x00000000;	/* R14 */
+	*pxTopOfStack = ( StackType_t ) 0xaaaaaaaa;	/* R14 */
 	pxTopOfStack--;	
 	*pxTopOfStack = ( StackType_t ) pxOriginalTOS; /* Stack used when task starts goes in R13. */
 	pxTopOfStack--;
@@ -128,11 +128,13 @@ StackType_t *pxOriginalTOS;
 	system mode, with interrupts enabled. */
 	*pxTopOfStack = ( StackType_t ) portINITIAL_SPSR;
 
+	#if 0
 	if( ( ( uint32_t ) pxCode & 0x01UL ) != 0x00 )
 	{
 		/* We want the task to start in thumb mode. */
 		*pxTopOfStack |= portTHUMB_MODE_BIT;
 	}
+	#endif
 
 	pxTopOfStack--;
 
@@ -145,11 +147,12 @@ StackType_t *pxOriginalTOS;
 	return pxTopOfStack;
 }
 /*-----------------------------------------------------------*/
-void vPortYieldProcessor( void ) __attribute__((interrupt("SWI"), naked));
-
 BaseType_t xPortStartScheduler( void )
 {
+	void vPortYieldProcessor( void );	
+
 	/* Setup SWI 0 */
+	//install_exc(EXC_SWI, vPortYieldProcessor);
 	install_swi(0, vPortYieldProcessor);
 
 	/* Start the timer that generates the tick ISR.  Interrupts are disabled
@@ -157,7 +160,7 @@ BaseType_t xPortStartScheduler( void )
 	prvSetupTimerInterrupt();
 
 	/* Start the first task. */
-	vPortISRStartFirstTask();
+	vPortStartFirstTask();
 
 	/* Should not get here! */
 	return 0;
@@ -176,13 +179,9 @@ void vPortEndScheduler( void )
  */
 static void prvSetupTimerInterrupt( void )
 {
-	#if configUSE_PREEMPTION == 0
-		extern void ( vNonPreemptiveTick ) ( void );
-		install_irq(IRQ_TIMER0, vNonPreemptiveTick);
-	#else
-		extern void ( vPreemptiveTick )( void );
-		install_irq(IRQ_TIMER0, vPreemptiveTick);
-	#endif
+	extern void ( vTimerIRQHandler ) ( void );
+	//install_exc(EXC_IRQ, vTimerIRQHandler);
+	install_irq(IRQ_TIMER0, vTimerIRQHandler);
 
     void __iomem *irq = (void __iomem *)IRQ_BASE;
     writeq(readq(irq + IRQ_MODEL) & ~(1 << IRQ_TIMER0), irq + IRQ_MODEL);

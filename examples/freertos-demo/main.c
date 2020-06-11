@@ -27,15 +27,18 @@
 
 static void task_a(void *pvParameters);
 static void task_b(void *pvParameters);
+static void task_c(void *pvParameters);
 
 int main(void)
 {
     //puts("Creating tasks");
     uart0_writeb('1');
 
-    BaseType_t result = xTaskCreate(task_a, "a task", 1024, NULL, tskIDLE_PRIORITY + 1, NULL);
+    BaseType_t result = xTaskCreate(task_a, "a task", 256, NULL, tskIDLE_PRIORITY + 1, NULL);
     uart0_writeb(result == pdPASS ? '+' : '-');
-    result = xTaskCreate(task_b, "b task", 1024, NULL, tskIDLE_PRIORITY + 1, NULL);
+    result = xTaskCreate(task_b, "b task", 256, NULL, tskIDLE_PRIORITY + 1, NULL);
+    uart0_writeb(result == pdPASS ? '+' : '-');
+    result = xTaskCreate(task_c, "c task", 256, NULL, tskIDLE_PRIORITY + 1, NULL);
     uart0_writeb(result == pdPASS ? '+' : '-');
 
     //puts("Starting scheduler");
@@ -60,6 +63,15 @@ static void task_b(void *pvParameters)
     while(1) {
         uart0_writeb('b');
         vTaskDelay(500 / portTICK_PERIOD_MS);
+        //taskYIELD();
+    }
+}
+
+static void task_c(void *pvParameters)
+{
+    while(1) {
+        uart0_writeb('c');
+        vTaskDelay(250 / portTICK_PERIOD_MS);
         //taskYIELD();
     }
 }

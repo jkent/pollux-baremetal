@@ -38,7 +38,7 @@ static const uint8_t magic_lut[64] asm ("magic_lut") = {
 };
 
 __attribute__((interrupt("SWI"), naked))
-void swi_handler(void)
+static void swi_handler(void)
 {
 	asm("push {r0-r1, lr}\n\t"
 		"mrs r0, spsr\n\t"
@@ -55,29 +55,28 @@ void swi_handler(void)
 }
 
 __attribute__((interrupt("ABORT")))
-void pabort_handler(void)
+static void pabort_handler(void)
 {
 	uart0_writeb('p');
 	uart0_writeb('!');
 }
 
 __attribute__((interrupt("ABORT")))
-void dabort_handler(void)
+static void dabort_handler(void)
 {
 	uart0_writeb('d');
 	uart0_writeb('!');
 }
 
 __attribute__((interrupt("IRQ")))
-void irq_handler(void)
+static void irq_handler(void) 
 {
 	void __iomem *irq = (void __iomem *)IRQ_BASE;
-	u64 pending = readl(irq + IRQ_PENDL) & 0xFFFFFFFFFFFULL;
+	u64 pending = readq(irq + IRQ_PENDL) & 0xFFFFFFFFFFFULL;
 	u8 n = magic_lut[(u64)(pending * 0x022FDD63CC95386DULL) >> 58];
 	if (irq_table[n] != NULL) {
 		irq_table[n]();
 	}
-	//writel(pending, irq + IRQ_PENDL);
 }
 
 void init_exceptions(void)
@@ -86,15 +85,19 @@ void init_exceptions(void)
 		"msr cpsr_c, #0xD1\n\t" /* fiq */
 		"mov sp, r0\n\t"
 		"sub r0, r0, #" XSTR(CONFIG_BAREMETAL_FIQ_STACK_SIZE) "\n\t"
+
 		"msr cpsr_c, #0xD2\n\t" /* irq */
 		"mov sp, r0\n\t"
 		"sub r0, r0, #" XSTR(CONFIG_BAREMETAL_IRQ_STACK_SIZE) "\n\t"
+
 		"msr cpsr_c, #0xD7\n\t" /* abt */
 		"mov sp, r0\n\t"
 		"sub r0, r0, #" XSTR(CONFIG_BAREMETAL_ABT_STACK_SIZE) "\n\t"
+
 		"msr cpsr_c, #0xDB\n\t" /* und */
 		"mov sp, r0\n\t"
 		"sub r0, r0, #" XSTR(CONFIG_BAREMETAL_UND_STACK_SIZE) "\n\t"
+
 		"msr cpsr_c, #0xD3\n\t" ::: "r0"); /* svc */
 
 	void *exc_base;

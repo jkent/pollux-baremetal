@@ -75,7 +75,6 @@ config BAREMETAL_NEWLIB
 
 config BAREMETAL_FREERTOS
 config BAREMETAL_FREERTOS
-	#depends on BAREMETAL_NEWLIB
 	bool "Use FreeRTOS"
 	default y
 
@@ -172,4 +171,5 @@ config BAREMETAL_UART_FIFO
 	depends on NOT_IMPLEMENTED
 	depends on BAREMETAL_EXCEPTION
 endchoice
+
 endmenu
