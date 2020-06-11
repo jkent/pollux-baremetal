@@ -3,11 +3,11 @@
         {
             "name": "Linux arm-none-eabi",
             "includePath": [
-                "${workspaceFolder}/**",
+                "${workspaceFolder}/include",
                 "${workspaceFolder}/baremetal/freertos"
             ],
             "defines": [],
-            "compilerPath": "/opt/x-tools/arm-none-eabi/bin/arm-none-eabi-gcc",
+            "compilerPath": "${env:HOME}/x-tools/arm-none-eabi/bin/arm-none-eabi-gcc",
             "cStandard": "c99",
             "cppStandard": "c++17",
             "intelliSenseMode": "gcc-arm",
@@ -16,24 +16,6 @@
                 "path": [
                     "${workspaceFolder}/**",
                     "${workspaceFolder}/baremetal/freertos"
-                ],
-                "limitSymbolsToIncludedHeaders": true
-            }
-        },
-        {
-            "name": "Linux",
-            "includePath": [
-                "${workspaceFolder}/**"
-            ],
-            "defines": [],
-            "compilerPath": "/usr/bin/gcc",
-            "cStandard": "c11",
-            "cppStandard": "gnu++14",
-            "intelliSenseMode": "clang-x64",
-            "compilerArgs": [],
-            "browse": {
-                "path": [
-                    "${workspaceFolder}/**"
                 ],
                 "limitSymbolsToIncludedHeaders": true
             }

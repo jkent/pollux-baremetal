@@ -17,6 +17,7 @@
  */
 
 #include <mach/alive.h>
+#include <mach/dma.h>
 #include <mach/gpio.h>
 #include <mach/uart.h>
 
@@ -53,25 +54,6 @@ _vectors:
 .word _vect_fiq
 
 _exc_reset:
-
-/* setup stack */
-#if defined(CONFIG_BAREMETAL_EXCEPTION)
-	ldr r0, =_stack_top - CONFIG_BAREMETAL_FIQ_STACK_SIZE - \
-		CONFIG_BAREMETAL_IRQ_STACK_SIZE - CONFIG_BAREMETAL_ABT_STACK_SIZE - \
-		CONFIG_BAREMETAL_UND_STACK_SIZE
-#else
-	ldr r0, =_stack_top
-#endif
-	mov sp, r0
-
-/* clear .bss */
-	ldr r0, =_bss
-	ldr r1, =_ebss
-	mov r2, #0
-1:	cmp r0, r1
-	strne r2, [r0], #4
-	bne 1b
-
 #if defined(CONFIG_BAREMETAL_AUTO_RELOCATE)
 /* relocation code is position independent code */
 	sub r0, pc, #8 + . - _entry /* _entry_address running in RAM */
@@ -80,7 +62,10 @@ _exc_reset:
 	beq 2f
 
 #if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) || defined(CONFIG_BAREMETAL_BOOT_SOURCE_NAND)
-	ldr r2, =CONFIG_BAREMETAL_RUNTIME_ADDRESS + (16 * 1024)
+/* DMA_DSTADDR has our relocate size */
+	mov r3, #DMA0_BASE
+	ldr r2, [r3, #DMA_DSTADDR]
+	add r2, r1
 #elif defined (CONFIG_BAREMETAL_BOOT_SOURCE_RAM)
 	ldr r2, =_reloc_end
 #endif
@@ -102,18 +87,26 @@ _exc_reset:
 
 .type entry_thumb, %function
 entry_thumb:
-#if defined(CONFIG_BAREMETAL_LATCH_POWER)
+/* latch power */
 	ldr r0, =ALIVE_BASE
-	mov r1, #ALIVE_PWRGATEREG_NPOWERGATING
-	str r1, [r0, #ALIVE_PWRGATEREG]	
 	mov r1, #0
+	mov r2, #ALIVE_PWRGATEREG_NPOWERGATING
+	str r2, [r0, #ALIVE_PWRGATEREG]	
 	str r1, [r0, #ALIVE_GPIORSTREG]
-	mov r1, #ALIVE_GPIO_VDDPWRONRST
-	str r1, [r0, #ALIVE_GPIOSETREG]
-	mov r1, #0
+	mov r2, #ALIVE_GPIO_VDDPWRONRST
+	str r2, [r0, #ALIVE_GPIOSETREG]
 	str r1, [r0, #ALIVE_GPIOSETREG]
 	str r1, [r0, #ALIVE_PWRGATEREG]
+
+/* setup stack */
+#if defined(CONFIG_BAREMETAL_EXCEPTION)
+	ldr r0, =_stack_top - CONFIG_BAREMETAL_FIQ_STACK_SIZE - \
+		CONFIG_BAREMETAL_IRQ_STACK_SIZE - CONFIG_BAREMETAL_ABT_STACK_SIZE - \
+		CONFIG_BAREMETAL_UND_STACK_SIZE
+#else
+	ldr r0, =_stack_top
 #endif
+	mov sp, r0
 
 #if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART)
 /* enable TXD pin */
@@ -124,13 +117,16 @@ entry_thumb:
 	bic r3, r3, r1
 	orr r3, r3, r2
 	str r3, [r0, #GPIO_ALTFNL]
+
 /* enable TX and RX */	
 	ldr r0, =UART0_BASE
 	mov r1, #(UART_UCON_TRANSMODE_INTPOLL | UART_UCON_RECVMODE_INTPOLL)
 	strh r1, [r0, #UART_UCON]
+
 /* send "UART" magic */
 	ldr r0, =0x54524155
 	bl uart0_writel
+
 /* set baudinfo */
 	bl uart0_readl
 	mov r4, r0
@@ -138,6 +134,7 @@ entry_thumb:
 	bl uart0_writeb
 	mov r0, r4
 	bl uart0_set_baudinfo
+
 /* wait for 0xAA55 magic */
 1:	bl uart0_readb
 	cmp r0, #0x55
@@ -147,6 +144,7 @@ entry_thumb:
 	bne 1b
 	mov r0, #1
 	bl uart0_writeb
+
 /* load rest of code */
 	ldr r0, =0xA4000000
 	ldr r1, [r0]
@@ -158,11 +156,13 @@ entry_thumb:
 	add r4, r4, r0
 2:	ldr r0, =512
 	add r4, r4, r0
+
 /* read size */
 	bl uart0_readl
 	add r5, r4, r0
 	cmp r5, r4
 	ble 4f
+
 /* read code dword */
 3:	bl uart0_readl
 	str r0, [r4]
@@ -172,17 +172,8 @@ entry_thumb:
 4:
 #endif /* defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART) */
 
-#if defined(CONFIG_BAREMETAL_STARTUP)
-	ldr r4, =startup
-#else
-	ldr r4, =main
-#if defined(CONFIG_BAREMETAL_NEWLIB)
-	ldr r4, =exit
-	blx r4
-#endif /* defined(CONFIG_BAREMETAL_NEWLIB) */
-#endif /* defined(CONFIG_BAREMETAL_STARTUP) */
-	blx r4
-	b .
+	ldr r0, =startup
+	bx r0
 .ltorg
 
 #if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART)
@@ -229,7 +220,6 @@ uart0_readb:
 	mov r2, #UART_RHB
 	ldrb r0, [r1, r2]
 	bx lr
-	nop
 
 .type uart0_writel, %function
 uart0_writel:

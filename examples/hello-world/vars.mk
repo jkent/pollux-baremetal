@@ -1,2 +1,2 @@
-target := hello_world.bin
+target := hello-world.bin
 obj-y += main.o

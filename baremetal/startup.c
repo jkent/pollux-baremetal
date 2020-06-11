@@ -16,10 +16,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <asm/io.h>
+#include <asm/types.h>
 #include <baremetal/cache.h>
 #include <baremetal/clocking.h>
 #include <baremetal/exception.h>
 #include <baremetal/mmu.h>
+#include <baremetal/util.h>
+#include <driver/uart.h>
+#include <mach/alive.h>
 #include <stdlib.h>
 
 extern void __libc_init_array(void);
@@ -28,6 +33,27 @@ extern int main(void);
 
 void startup(void)
 {
+	/* clear .bss */
+	asm ("ldr r0, =_bss\n\t"
+		"ldr r1, =_ebss\n\t"
+		"mov r2, #0\n"
+	"1:	cmp r0, r1\n\t"
+		"bhs 2f\n\t"
+		"str r2, [r0]\n\t"
+		"add r0, r0, #4\n\t"
+		"b 1b\n"
+	"2:" ::: "r0", "r1", "r2", "cc", "memory");
+
+#if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART)
+	uart0_writeb(0x5A);
+	while(uart0_readb() != 0xA5)
+		;
+#endif
+
+#if defined(CONFIG_BAREMETAL_STARTUP_DEBUG)
+	halt();
+#endif
+
 #if defined(CONFIG_BAREMETAL_EXCEPTION)
 	init_exceptions();
 #endif

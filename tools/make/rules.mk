@@ -120,61 +120,51 @@ $$(BUILD)/%.o: $(1)/%.S | $$(DEPS)
 
 # .arm.c -> .arm.o
 $$(BUILD)/%.arm.o: $(1)/%.arm.c | $$(DEPS)
-	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CC       $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -marm $$(INCLUDE) $$< -o $$@
 
 # .thumb.c -> .thumb.o
 $$(BUILD)/%.thumb.o: $(1)/%.thumb.c | $$(DEPS)
-	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CC       $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -mthumb $$(INCLUDE) $$< -o $$@
 
 # .c -> .o
 $$(BUILD)/%.o: $(1)/%.c | $$(DEPS)
-	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CC       $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(INCLUDE) $$< -o $$@
 
 # .arm.c -> .o
 $$(BUILD)/%.o: $(1)/%.arm.c | $$(DEPS)
-	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CC       $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -marm $$(INCLUDE) $$< -o $$@
 
 # .thumb.c -> .o
 $$(BUILD)/%.o: $(1)/%.thumb.c | $$(DEPS)
-	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CC       $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -mthumb $$(INCLUDE) $$< -o $$@
 
 # .arm.cpp -> .arm.o
 $$(BUILD)/%.arm.o: $(1)/%.arm.cpp | $$(DEPS)
-	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CXX      $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -marm $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
 
 # .thumb.cpp -> .arm.o
 $$(BUILD)/%.thumb.o: $(1)/%.thumb.cpp | $$(DEPS)
-	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CXX      $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -mthumb $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
 
 # .cpp -> .o
 $$(BUILD)/%.o: $(1)/%.cpp | $$(DEPS)
-	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CXX      $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
 
 # .arm.cpp -> .o
 $$(BUILD)/%.o: $(1)/%.arm.cpp | $$(DEPS)
-	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CXX      $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -marm $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
 
 # .thumb.cpp -> .o
 $$(BUILD)/%.o: $(1)/%.thumb.cpp | $$(DEPS)
-	$$(Q) mkdir -p $$(@D)
 	$$(D) "   CXX      $$<"
 	$$(Q)$$(CC) -c -MMD -MP -MF $$@.d -MQ $$@ $$(CFLAGS) -mthumb $$(CXXFLAGS) $$(INCLUDE) $$< -o $$@
 endef
@@ -186,7 +176,6 @@ $(BUILD)/config.h: $(BASEDIR)/.config | $$(@D)/.
 	$(Q)genconfig.py --header-path $@
 
 $(BUILD)/$(basename $(target)).elf: $(BUILD)/$(ldscript) $(objs) | $$(@D)/.
-	$(Q) mkdir -p $(@D)
 	$(D) "   LD       $<"
 	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -T $^ $(LIBS) -o $@
 
@@ -204,5 +193,10 @@ clean:
 	@rm -rf $(BUILD)
 
 .PHONY: run
+ifdef CONFIG_BAREMETAL_BOOT_SOURCE_RAM
 run: $(BUILD)/$(target)
-	${MICROMON_PATH}/bootstrap.py $<
+	${MICROMON_PATH}/ram_boot.py $<
+else ifdef CONFIG_BAREMETAL_BOOT_SOURCE_UART
+run: $(BUILD)/$(target)
+	${MICROMON_PATH}/uart_boot.py $<
+endif

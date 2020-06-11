@@ -72,12 +72,12 @@ __attribute__((interrupt("IRQ")))
 void irq_handler(void)
 {
 	void __iomem *irq = (void __iomem *)IRQ_BASE;
-	u64 pending = readq(irq + IRQ_PENDL) & 0xFFFFFFFFFFFULL;
+	u64 pending = readl(irq + IRQ_PENDL) & 0xFFFFFFFFFFFULL;
 	u8 n = magic_lut[(u64)(pending * 0x022FDD63CC95386DULL) >> 58];
 	if (irq_table[n] != NULL) {
 		irq_table[n]();
 	}
-	writeq(pending, irq + IRQ_PENDL);
+	//writel(pending, irq + IRQ_PENDL);
 }
 
 void init_exceptions(void)

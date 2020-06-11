@@ -114,7 +114,7 @@ void vPortYieldProcessor( void )
 		writel(readl(timer + TIMER_TMRCONTROL) | TIMER_INTPEND, timer + TIMER_TMRCONTROL);
 
 		void __iomem *irq = (void __iomem *)IRQ_BASE;
-		writeq(readq(irq + IRQ_PENDL) | (1 << IRQ_TIMER0), irq + IRQ_PENDL);
+		writel(readq(irq + IRQ_PENDL) | (1 << IRQ_TIMER0), irq + IRQ_PENDL);
 	}
 
 #else
@@ -127,18 +127,18 @@ void vPortYieldProcessor( void )
 		/* Save the context of the interrupted task. */
 		portSAVE_CONTEXT();	
 
+		//uart0_writeb('t');
+
 		/* Increment the RTOS tick count, then look for the highest priority 
 		task that is ready to run. */
 		__asm volatile
 		(
-			"	bl xTaskIncrementTick	\t\n" \
+			"	blx xTaskIncrementTick	\t\n" \
 			"	cmp r0, #0				\t\n" \
 			"	beq SkipContextSwitch	\t\n" \
-			"	bl vTaskSwitchContext	\t\n" \
+			"	blx vTaskSwitchContext	\t\n" \
 			"SkipContextSwitch:			\t\n" ::: "r0"
 		);
-
-		uart0_writeb('t');
 
 		/* Ready for the next interrupt. */
 		void __iomem *timer = (void __iomem *)TIMER0_BASE;

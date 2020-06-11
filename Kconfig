@@ -34,11 +34,6 @@ config BAREMETAL_RAM_SIZE
 	default 0x4000000 if BAREMETAL_RAM_SIZE_64
 	default 0x8000000 if BAREMETAL_RAM_SIZE_128
 
-menuconfig BAREMETAL_LINKER_SCRIPT
-	bool "Use baremetal linker script"
-	default y
-
-if BAREMETAL_LINKER_SCRIPT
 config BAREMETAL_SHADOW
 	bool "Shadow RAM" if BAREMETAL_BOOT_SOURCE_RAM
 	default y if BAREMETAL_BOOT_SOURCE_RAM
@@ -55,32 +50,12 @@ config BAREMETAL_RUNTIME_ADDRESS
 	default 0x80000000 if !BAREMETAL_SHADOW
 	range 0x00000000 0x07FFFFFF if BAREMETAL_SHADOW
 	range 0x80000000 0x87FFFFFF if !BAREMETAL_SHADOW
-endif
 
-config BAREMETAL_ENTRY
-menuconfig BAREMETAL_ENTRY
-	bool "Use baremetal entry code"
-	default y
-
-if BAREMETAL_ENTRY
 config BAREMETAL_AUTO_RELOCATE
 	bool "Auto relocate"
 	default y
 
-config BAREMETAL_LATCH_POWER
-	bool "Latch power"
-	default y
-	help
-	  Say Y here to enable latching power in startup code.
-endif
-
-config BAREMETAL_STARTUP
-menuconfig BAREMETAL_STARTUP
-	depends on BAREMETAL_ENTRY
-	bool "Use baremetal startup code"
-	default y
-
-if BAREMETAL_STARTUP
+menu "Startup options"
 config BAREMETAL_NEWLIB
 	bool "Use Newlib"
 	default y
@@ -90,6 +65,13 @@ config BAREMETAL_FREERTOS
 	#depends on BAREMETAL_NEWLIB
 	bool "Use FreeRTOS"
 	default y
+
+config BAREMETAL_STARTUP_DEBUG
+	bool "Startup debug"
+	default n
+	help
+		Say Y here if you want to halt the processor in a loop right
+		after latching the power for debugging purposes.
 
 config BAREMETAL_EXCEPTION
 	bool "Setup exceptions"
@@ -177,4 +159,4 @@ config BAREMETAL_UART_FIFO
 	depends on NOT_IMPLEMENTED
 	depends on BAREMETAL_EXCEPTION
 endchoice
-endif
+endmenu
