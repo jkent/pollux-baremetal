@@ -16,8 +16,19 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <asm/types.h>
 #include <baremetal/util.h>
 #include <stdbool.h>
+
+u32 fls(u32 x)
+{
+	u32 count = 0;
+
+	while (x >>= 1) {
+		count++;
+	}
+	return count + 1;
+}
 
 void halt(void)
 {

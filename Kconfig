@@ -8,17 +8,30 @@ config BAREMETAL_BOOT_SOURCE_UART
 	bool "UART boot"
 config BAREMETAL_BOOT_SOURCE_NAND
 	bool "NAND flash"
-	depends on NOT_IMPLEMENTED
 config BAREMETAL_BOOT_SOURCE_NOR
 	bool "NOR flash"
 	depends on HAVE_NOR
 	depends on NOT_IMPLEMENTED
 endchoice
 
+choice BAREMETAL_NAND_PAGE_SIZE
+	prompt "NAND page size" if BAREMETAL_BOOT_SOURCE_NAND
+	default BAREMETAL_NAND_PAGE_SIZE_2048
+config BAREMETAL_NAND_PAGE_SIZE_512
+	bool "512 B"
+config BAREMETAL_NAND_PAGE_SIZE_2048
+	bool "2 KiB"
+endchoice
+
+config BAREMETAL_NAND_PAGE_SIZE
+	int
+	default 512 if BAREMETAL_NAND_PAGE_SIZE_512
+	default 2048 if BAREMETAL_NAND_PAGE_SIZE_2048
+
 choice BAREMETAL_RAM_SIZE
 	prompt "RAM size"
 config BAREMETAL_RAM_SIZE_16
-	bool "16M MiB"
+	bool "16 MiB"
 config BAREMETAL_RAM_SIZE_32
 	bool "32 MiB"
 config BAREMETAL_RAM_SIZE_64
