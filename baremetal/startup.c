@@ -25,6 +25,7 @@
 #include <baremetal/util.h>
 #include <driver/uart.h>
 #include <mach/alive.h>
+#include <mach/clkpwr.h>
 #include <stdlib.h>
 
 extern void __libc_init_array(void);
@@ -48,6 +49,8 @@ void startup(void)
 	uart0_writeb(0x5A);
 	while(uart0_readb() != 0xA5)
 		;
+#else
+	uart0_init_baudinfo((1 << 16) | (39 << 4) | (1 << 1));
 #endif
 
 #if defined(CONFIG_BAREMETAL_STARTUP_DEBUG)

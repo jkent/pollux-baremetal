@@ -52,20 +52,13 @@ void uart0_init_baudinfo(u32 baudinfo)
 	writel(UART_UCON_TRANSMODE_INTPOLL | UART_UCON_RECVMODE_INTPOLL, uart + UART_UCON);
 }
 
+#if !defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART)
 u8 uart0_readb(void)
 {
 	void __iomem *uart = (void __iomem *)UART0_BASE;
 	while (!(readw(uart + UART_TRSTATUS) & UART_TRSTATUS_RXREADY))
 		;
 	return readb(uart + UART_RHB);
-}
-
-u16 uart0_readw(void)
-{
-	u16 n;
-	n = uart0_readb();
-	n |= uart0_readb() << 8;
-	return n;
 }
 
 u32 uart0_readl(void)
@@ -75,7 +68,17 @@ u32 uart0_readl(void)
 	n |= uart0_readw() << 16;
 	return n;
 }
+#endif
 
+u16 uart0_readw(void)
+{
+	u16 n;
+	n = uart0_readb();
+	n |= uart0_readb() << 8;
+	return n;
+}
+
+#if !defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART)
 void uart0_writeb(u8 c)
 {
 	void __iomem *uart = (void __iomem *)UART0_BASE;
@@ -84,14 +87,15 @@ void uart0_writeb(u8 c)
 	writeb(c, uart + UART_THB);
 }
 
-void uart0_writew(u16 n)
-{
-	uart0_writeb(n);
-	uart0_writeb(n >> 8);
-}
-
 void uart0_writel(u32 n)
 {
 	uart0_writew(n);
 	uart0_writew(n >> 16);
+}
+#endif
+
+void uart0_writew(u16 n)
+{
+	uart0_writeb(n);
+	uart0_writeb(n >> 8);
 }

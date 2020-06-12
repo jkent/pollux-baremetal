@@ -177,7 +177,7 @@ entry_thumb:
 .ltorg
 
 #if defined(CONFIG_BAREMETAL_BOOT_SOURCE_UART)
-.type set_baudinfo, %function
+.type uart0_set_baudinfo, %function
 uart0_set_baudinfo:
 	push {r4, lr}
 /* set default value if 0 */
@@ -198,6 +198,7 @@ uart0_set_baudinfo:
 	str r1, [r2, r3]
 	pop {r4, pc}
 
+.global uart0_writeb
 .type uart0_writeb, %function
 uart0_writeb:
 /* wait for txempty */
@@ -209,6 +210,7 @@ uart0_writeb:
 	strb r0, [r1, #UART_THB]
 	bx lr
 
+.global uart0_readb
 .type uart0_readb, %function
 uart0_readb:
 /* wait for rxready */
@@ -221,6 +223,7 @@ uart0_readb:
 	ldrb r0, [r1, r2]
 	bx lr
 
+.global uart0_writel
 .type uart0_writel, %function
 uart0_writel:
 	push {lr}
@@ -233,6 +236,7 @@ uart0_writel:
 	bl uart0_writeb
 	pop {pc}
 
+.global uart0_readl
 .type uart0_readl, %function
 uart0_readl:
 	push {r4, lr}

@@ -192,11 +192,15 @@ $(BUILD)/$(basename $(target)).bin: $(BUILD)/$(basename $(target)).elf
 clean:
 	@rm -rf $(BUILD)
 
-.PHONY: run
+.PHONY: debug run
 ifdef CONFIG_BAREMETAL_BOOT_SOURCE_RAM
 run: $(BUILD)/$(target)
 	${MICROMON_PATH}/ram_boot.py $<
 else ifdef CONFIG_BAREMETAL_BOOT_SOURCE_UART
 run: $(BUILD)/$(target)
 	${MICROMON_PATH}/uart_boot.py $<
+	miniterm.py /dev/ttyUSB0 115200
 endif
+debug: ${BUILD}/${target}
+	arm-none-eabi-gdb
+

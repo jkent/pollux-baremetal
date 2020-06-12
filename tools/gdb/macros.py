@@ -12,7 +12,11 @@ class DebugUart(gdb.Command):
             super().__init__('q', gdb.COMMAND_USER)
 
         def invoke(self, args, tty):
-            gdb.execute('power off', tty)
+            try:
+                gdb.execute('power off', tty)
+            except:
+                pass
+
             sleep(0.1)
             run(['killall', 'JLinkGDBServer', 'miniterm.py'])
             gdb.execute('quit', tty)
@@ -29,12 +33,12 @@ class DebugUart(gdb.Command):
         except:
             gdb.execute('quit', tty)
 
+        DebugUart.Q()
+
         gdb.execute('file ' + elf_file, tty)
         run(['mate-terminal', '--window', '-e', 'JLinkGDBServer -device ARM9'], check=True)
         run(['mate-terminal', '--tab', '-e', 'miniterm.py /dev/ttyUSB0 115200'], check=True)
         gdb.execute('target remote localhost:2331', tty)
-
-        DebugUart.Q()
 
 class Power(gdb.Command):
     '''Control power of target'''
