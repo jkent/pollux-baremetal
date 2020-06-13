@@ -19,7 +19,6 @@
 #include <stdio.h>
 
 #include <asm/io.h>
-#include <mach/alive.h>
 #include <driver/nand.h>
 
 int main(void)
@@ -38,14 +37,6 @@ int main(void)
             printf("  chip_size = %u MiB\n", chip->chip_size);
         }
     }
-
-    puts("Powering off...");
-    void __iomem *alive = (void __iomem *)ALIVE_BASE;
-    writel(1, alive + ALIVE_PWRGATEREG);
-    writel(0, alive + ALIVE_GPIOSETREG);
-    writel(0x80, alive + ALIVE_GPIORSTREG);
-    writel(0, alive + ALIVE_GPIORSTREG);
-    writel(0, alive + ALIVE_PWRGATEREG);
 
     return 0;
 }
