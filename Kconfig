@@ -73,11 +73,6 @@ config BAREMETAL_NEWLIB
 	bool "Use Newlib"
 	default y
 
-config BAREMETAL_FREERTOS
-config BAREMETAL_FREERTOS
-	bool "Use FreeRTOS"
-	default y
-
 config BAREMETAL_STARTUP_DEBUG
 	bool "Startup debug"
 	default n
@@ -109,13 +104,17 @@ config BAREMETAL_UND_STACK_SIZE
 	hex "UND (undefined) mode stack size"
 	default 0x1000
 
+config BAREMETAL_FREERTOS
+	depends on BAREMETAL_EXCEPTION
+	bool "Use FreeRTOS"
+	default y
+
 config BAREMETAL_MMU
 	bool "Enable MMU"
 	default y
 	help
 	  Say Y here to enable the MMU, setup with a basic 1:1 mmemory map.
 
-config BAREMETAL_DCACHE
 config BAREMETAL_DCACHE
 	depends on BAREMETAL_MMU
 	bool "Enable DCache"

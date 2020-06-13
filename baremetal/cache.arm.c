@@ -31,7 +31,6 @@ void icache_enable(void)
 {
 	icache_invalidate();
 
-	/* Enable */
 	u32 cr;
 	asm("mrc p15, 0, %0, c1, c0, 0" : "=r" (cr) :: "cc");
 	cr |= CR_I;
@@ -44,6 +43,8 @@ void icache_disable(void)
 	asm("mrc p15, 0, %0, c1, c0, 0" : "=r" (cr) :: "cc");
 	cr &= ~CR_I;
 	asm("mcr p15, 0, %0, c1, c0, 0" :: "r" (cr));
+
+	icache_invalidate();
 }
 
 void dcache_invalidate(void)

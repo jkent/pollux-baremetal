@@ -21,7 +21,7 @@
 #include <asm/types.h>
 #include <stdbool.h>
 
-extern u32 main_tlb[0x1000];
+extern u32 *main_tlb;
 
 void mmu_init(void);
 void mmu_load(void *main_tlb);

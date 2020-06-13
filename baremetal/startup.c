@@ -63,6 +63,7 @@ void startup(void)
 
 #if defined(CONFIG_BAREMETAL_MMU)
  	mmu_init();
+	mmu_load(main_tlb);
     mmu_enable();
 #endif
 

@@ -26,6 +26,8 @@
 #define STR(x) #x
 #define XSTR(s) STR(s)
 
+#define CR_V (1 << 13)
+
 static irq_handler_t *exc_table = NULL;
 static irq_handler_t *irq_table = (irq_handler_t *)&_irq_table;
 static irq_handler_t *swi_table = (irq_handler_t *)&_swi_table;
@@ -59,6 +61,8 @@ static void pabort_handler(void)
 {
 	uart0_writeb('p');
 	uart0_writeb('!');
+	while (1)
+		;
 }
 
 __attribute__((interrupt("ABORT")))
@@ -66,6 +70,8 @@ static void dabort_handler(void)
 {
 	uart0_writeb('d');
 	uart0_writeb('!');
+	while (1)
+		;
 }
 
 __attribute__((interrupt("IRQ")))
@@ -105,7 +111,6 @@ void init_exceptions(void)
 	exc_base = (void *)0x00000000;
 #else
 
-#define CR_V (1 << 13)
 	/* set high exceptions */
 	u32 cr;
 	asm("mrc p15, 0, %0, c1, c0, 0" : "=r" (cr));
